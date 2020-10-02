@@ -27,7 +27,7 @@ O sistema como um todo é composto por:
 7. Potenciômetro;
 8. Raspberry Pi 4;
 
-![Figura](/figuras/Figura_Trabalho_1.png)
+![Figura](figuras/Figura_Trabalho_1.png)
 
 ## 3. Conexões entre os módulos do sistema
 
