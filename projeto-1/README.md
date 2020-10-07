@@ -7,6 +7,7 @@ Projeto 1 da disciplina de Fundamentos de Sistemas Embarcados
 Este trabalho tem por objetivo a realização do controle de temperatura de um sistema. O sistema possui internamente dois dispositivos para alterar sua temperatura. O primeiro é um resistor de potência de 15 Watts utilziado para aumentar temperatura e o segundo, uma ventoínha que puxa o ar externo (à temperatura ambiente) para reduzir a temperatura. 
 
 A temperatura de referência (TR) pode ser definida pelo usuário do sistema de duas maneiras:
+
 1. Através de um Potenciômetro;
 2. Através de entrada de teclado no terminal.
 
@@ -72,7 +73,3 @@ A avaliação será realizada seguindo os seguintes critérios:
 ## 7. Referências
 
 [Driver da Bosh para o sensor BME280](https://github.com/BoschSensortec/BME280_driver)
-
-
-
-
