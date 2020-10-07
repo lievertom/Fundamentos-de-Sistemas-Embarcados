@@ -3,3 +3,4 @@ obj/*.o
 data/*.csv
 bin/bin
 *.swp
+.vscode/
