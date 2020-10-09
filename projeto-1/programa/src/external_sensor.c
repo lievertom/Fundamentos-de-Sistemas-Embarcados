@@ -14,12 +14,16 @@
 /*! @file bme280_interface.c
  * @brief Interface for sensor driver 
  */
-#include "bme280_interface.h"
+#include "external_sensor.h"
 
 /****************************************************************************/
 /*!                         Macros                                       */
 #define BUS "/dev/i2c-1" // sensor bus
 
+/****************************************************************************/
+
+struct identifier id;
+struct bme280_dev device;
 
 /****************************************************************************/
 /*!                         Functions                                       */
@@ -29,14 +33,9 @@
  */
 int8_t user_i2c_read(uint8_t reg_addr, uint8_t *data, uint32_t len, void *intf_ptr)
 {
-    struct identifier id;
-
-    id = *((struct identifier *)intf_ptr);
-
     write(id.file_descriptor, &reg_addr, 1);
     read(id.file_descriptor, data, len);
-
-    return 0;
+    return BME280_OK;
 }
 
 /*!
@@ -54,10 +53,6 @@ void user_delay_us(uint32_t period, void *intf_ptr)
 int8_t user_i2c_write(uint8_t reg_addr, const uint8_t *data, uint32_t len, void *intf_ptr)
 {
     uint8_t *buf;
-    struct identifier id;
-
-    id = *((struct identifier *)intf_ptr);
-
     buf = (uint8_t *)malloc(len + 1);
     buf[0] = reg_addr;
     memcpy(buf + 1, data, len);
@@ -65,116 +60,53 @@ int8_t user_i2c_write(uint8_t reg_addr, const uint8_t *data, uint32_t len, void 
     {
         return BME280_E_COMM_FAIL;
     }
-
     free(buf);
-
     return BME280_OK;
 }
 
 /*!
- * @brief This API used to adapting the sensor's registers.
+ * @brief This API reads the sensor temperature, pressure and humidity data in normal mode.
  */
-void sensor_data(struct bme280_data *comp_data)
+int8_t stream_sensor_data_normal_mode()
 {
-    float temperature, pressure, humidity;
+	int8_t result;
+	uint8_t settings_sel;
 
-#ifdef BME280_FLOAT_ENABLE
-    temperature = comp_data->temperature;
-    pressure = 0.01 * comp_data->pressure;
-    humidity = comp_data->humidity;
-#else
-#ifdef BME280_64BIT_ENABLE
-    temperature = 0.01f * comp_data->temperature;
-    pressure = 0.0001f * comp_data->pressure;
-    humidity = 1.0f / 1024.0f * comp_data->humidity;
-#else
-    temperature = 0.01f * comp_data->temperature;
-    pressure = 0.01f * comp_data->pressure;
-    humidity = 1.0f / 1024.0f * comp_data->humidity;
-#endif
-#endif
-    comp_data->temperature = temperature;
-    comp_data->pressure = pressure;
-    comp_data->humidity = humidity;
-}
+	/* Recommended mode of operation: Indoor navigation */
+	device.settings.osr_h = BME280_OVERSAMPLING_1X;
+	device.settings.osr_p = BME280_OVERSAMPLING_16X;
+	device.settings.osr_t = BME280_OVERSAMPLING_2X;
+	device.settings.filter = BME280_FILTER_COEFF_16;
+	device.settings.standby_time = BME280_STANDBY_TIME_62_5_MS;
 
-/*!
- * @brief This API reads the sensor temperature, pressure and humidity data in forced mode.
- */
-int8_t stream_sensor_data_forced_mode(struct bme280_dev *device)
-{
-    /* Variable to define the result */
-    int8_t result = BME280_OK;
-
-    /* Variable to define the selecting sensors */
-    uint8_t settings_sel = 0;
-
-    /* Variable to store minimum wait time between consecutive measurement in force mode */
-    uint32_t req_delay;
-
-    /* Structure to get the pressure, temperature and humidity values */
-    struct bme280_data comp_data;
-
-    /* Recommended mode of operation: Indoor navigation */
-    device->settings.osr_h = BME280_OVERSAMPLING_1X;
-    device->settings.osr_p = BME280_OVERSAMPLING_16X;
-    device->settings.osr_t = BME280_OVERSAMPLING_2X;
-    device->settings.filter = BME280_FILTER_COEFF_16;
-
-    settings_sel = BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL;
-
-    /* Set the sensor settings */
-    result = bme280_set_sensor_settings(settings_sel, device);
+	settings_sel = BME280_OSR_PRESS_SEL;
+	settings_sel |= BME280_OSR_TEMP_SEL;
+	settings_sel |= BME280_OSR_HUM_SEL;
+	settings_sel |= BME280_STANDBY_SEL;
+	settings_sel |= BME280_FILTER_SEL;
+	result = bme280_set_sensor_settings(settings_sel, &device);
     if (result != BME280_OK)
     {
         fprintf(stderr, "Failed to set sensor settings (code %+d).", result);
-
         return result;
     }
-
-    /*Calculate the minimum delay required between consecutive measurement based upon the sensor enabled
-     *  and the oversampling configuration. */
-    req_delay = bme280_cal_meas_delay(&device->settings);
-
-    /* Continuously stream sensor data */
-    while (1)
+	result = bme280_set_sensor_mode(BME280_NORMAL_MODE, &device);
+    if (result != BME280_OK)
     {
-        /* Set the sensor to forced mode */
-        result = bme280_set_sensor_mode(BME280_FORCED_MODE, device);
-        if (result != BME280_OK)
-        {
-            fprintf(stderr, "Failed to set sensor mode (code %+d).", result);
-            break;
-        }
-
-        /* Wait for the measurement to complete and print data */
-        device->delay_us(req_delay, device->intf_ptr);
-        result = bme280_get_sensor_data(BME280_ALL, &comp_data, device);
-        if (result != BME280_OK)
-        {
-            fprintf(stderr, "Failed to get sensor data (code %+d).", result);
-            break;
-        }
-
-        print_sensor_data(&comp_data);
+        fprintf(stderr, "Failed to set sensor mode (code %+d).", result);
+	    return result;
     }
-
-    return result;
+    sleep(1);
+	return result;
 }
 
 /*!
  * @brief This function starts the bme280 sensor.
  */
-void bme280_sensor()
+void initialize_external_sensor()
 {
-    struct bme280_dev device;
-
-    struct identifier id;
-
     /* Variable to define the result */
-    int8_t result = BME280_OK;
-
-    // char bus[] = "/dev/i2c-1";
+    int8_t result;
 
     if ((id.file_descriptor = open(BUS, O_RDWR)) < 0)
     {
@@ -207,11 +139,19 @@ void bme280_sensor()
         fprintf(stderr, "Failed to initialize the device (code %+d).\n", result);
         exit(1);
     }
-
-    result = stream_sensor_data_forced_mode(&device);
+    result = stream_sensor_data_normal_mode();
     if (result != BME280_OK)
     {
         fprintf(stderr, "Failed to stream sensor data (code %+d).\n", result);
         exit(1);
     }
+}
+
+float external_temperature()
+{
+    struct bme280_data comp_data;
+    /* Delay while the sensor completes a measurement */
+    user_delay_us(70, device.intf_ptr);
+    bme280_get_sensor_data(BME280_ALL, &comp_data, &device);
+    return comp_data.temperature;
 }
