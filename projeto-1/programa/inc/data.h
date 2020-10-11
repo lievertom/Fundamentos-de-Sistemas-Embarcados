@@ -2,22 +2,13 @@
 #define DATA_H_
 
 #include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
 
-#include "bme280.h"
-#include "uart.h"
 
-#define POTENTIOMETER 0xA1
-#define TERMINATOR 0x00
-
-struct Data
-{
-    char * date;
-    char * hour;
-    float internal_temperature;
-    float external_temperature;
-    float input_temperature;
-};
-
+#define PATH_DATA "dat/data.csv"
+#define DATE_SIZE 11
+#define HOUR_SIZE 9
 
 /****************************************************************************/
 /*!                         Functions                                       */
@@ -31,22 +22,8 @@ struct Data
  *  @return void.
  *
  */
-float input_temperature()
-{
-    float temperature;
-    int control_input = 0;
+void save_data (float * internal_temperature, float * external_temperature, float * reference_temperature);
 
-    if (control_input)
-    {
-        scanf("%f", &temperature); 
-    }
-    else
-    {
-        unsigned char command[] = {POTENTIOMETER, TERMINATOR};
-        temperature = uart(command);
-    }
-    return temperature;
-}
 
 
 #endif /* DATA_H_ */
