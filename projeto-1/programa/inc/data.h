@@ -10,6 +10,17 @@
 #define DATE_SIZE 11
 #define HOUR_SIZE 9
 
+
+/****************************************************************************/
+/*!                            Structs                                      */
+struct Data 
+{
+    float internal_temperature;
+    float external_temperature;
+    float reference_temperature;
+    float hysteresis;
+};
+
 /****************************************************************************/
 /*!                         Functions                                       */
 

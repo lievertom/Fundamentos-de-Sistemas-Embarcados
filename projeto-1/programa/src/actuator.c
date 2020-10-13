@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+/* Header includes */
+#include <bcm2835.h>
 
 #include "actuator.h"
 

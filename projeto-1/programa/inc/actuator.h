@@ -1,8 +1,6 @@
 #ifndef ACTUATOR_H_
 #define ACTUATOR_H_
 
-/* Header includes */
-#include <bcm2835.h>
 
 #define FAN RPI_V2_GPIO_P1_18 
 #define RESISTANCE RPI_V2_GPIO_P1_16

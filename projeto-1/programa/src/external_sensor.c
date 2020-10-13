@@ -147,7 +147,7 @@ void initialize_external_sensor()
     }
 }
 
-float external_temperature()
+float get_external_temperature()
 {
     struct bme280_data comp_data;
     /* Delay while the sensor completes a measurement */

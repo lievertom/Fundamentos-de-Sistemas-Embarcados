@@ -68,6 +68,6 @@ void initialize_external_sensor();
  * @return External temperature
  *
  */
-float external_temperature();
+float get_external_temperature();
 
 #endif /* EXTERNAL_SENSOR_H_ */
