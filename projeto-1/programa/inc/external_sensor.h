@@ -65,9 +65,9 @@ void initialize_external_sensor();
 /*!
  * @brief Function reads temperature, humidity and pressure data in normal mode.
  *
- * @return External temperature
+ * @return void
  *
  */
-float get_external_temperature();
+void *get_external_temperature(void *args);
 
 #endif /* EXTERNAL_SENSOR_H_ */

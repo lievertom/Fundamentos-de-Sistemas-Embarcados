@@ -1,9 +1,11 @@
 /* header includes */
-#include "lcd.h"
 #include <wiringPiI2C.h>
 #include <wiringPi.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#include "data.h"
+#include "lcd.h"
 
 int fd;
 
@@ -55,7 +57,7 @@ void write_string(const char *str)
 void write_float (float value)
 {
   char buffer[20];
-  sprintf(buffer, "%.2f",  value);
+  sprintf(buffer, "%.1f",  value);
   write_string(buffer);
 }
 
@@ -110,17 +112,17 @@ void initialize_lcd()
   delayMicroseconds(500);
 }
 
-void print_lcd(float internal_temperature, float external_temperature, float reference_temperature, float hysteresis)
+void *print_lcd (void *args)
 {
-  clear_lcd();
+  Data *data = (Data *) args;
+  // clear_lcd();
   set_cursor_location(LINE1);
-  write_string("TI");
-  write_float(internal_temperature);
-  write_string(" TE");
-  write_float(external_temperature);
+  write_string("TI:");
+  write_float(data->internal_temperature);
+  write_string(" TE:");
+  write_float(data->external_temperature);
   set_cursor_location(LINE2);
-  write_string("TR");
-  write_float(reference_temperature);
-  write_string(" H");
-  write_float(hysteresis);
+  write_string("TR:");
+  write_float(data->reference_temperature);
+  return NULL;
 }

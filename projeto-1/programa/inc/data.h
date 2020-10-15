@@ -13,13 +13,14 @@
 
 /****************************************************************************/
 /*!                            Structs                                      */
-struct Data 
+typedef struct Data 
 {
     float internal_temperature;
     float external_temperature;
     float reference_temperature;
     float hysteresis;
-};
+    int potentiometer;
+} Data;
 
 /****************************************************************************/
 /*!                         Functions                                       */
@@ -33,7 +34,7 @@ struct Data
  *  @return void.
  *
  */
-void save_data (float * internal_temperature, float * external_temperature, float * reference_temperature);
+void *save_data (void *args);
 
 
 

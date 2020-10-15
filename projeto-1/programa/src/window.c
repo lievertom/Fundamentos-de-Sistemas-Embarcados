@@ -4,23 +4,13 @@
 #include <pthread.h>
 #include <unistd.h>
 
-//Constastes das teclas ENTER e ESCAPE.
-#define ENTER          10
-#define ESCAPE         27
- 
-#define NTEMPERATURE_VALUES 41
-#define TEMPERATURE_FIRST_VALUE 10
-
-#define NHYSTERESIS_VALUES 10
-#define HYSTERESIS_FIRST_VALUE 0
-
-#define NLINES_MENU    1
-#define NCOLUMNS_MENU  80
-#define FIRST_LINE     0
-#define FIRST_COLUMN   0
-
-void create_menu_bar(WINDOW *menu_bar)  //Função encarregada de criar um menu em nosso sistema
+#include "data.h"
+#include "window.h"
+    
+void create_menu_bar()  //Função encarregada de criar um menu em nosso sistema
 {
+    WINDOW *menu_bar = windows.menu_bar;
+    menu_bar=subwin(stdscr,NLINES_MENU, COLS, FIRST_LINE_MENU, FIRST_COLUMN_MENU);
     wbkgd(menu_bar,COLOR_PAIR(2));    //Alterando a cor de fundo do menu
     waddstr(menu_bar,"Temperature");    //Esta função escreve os nomes dos menus
     wattron(menu_bar,COLOR_PAIR(3));  //Alterando o par de cores para 3
@@ -34,20 +24,37 @@ void create_menu_bar(WINDOW *menu_bar)  //Função encarregada de criar um menu 
     refresh();
 }
 
-void print_commands()
+void print_commands(int line)
 {
-    move(2,1);
+    move(line,1);
     printw("Commands:");
-    move(3,3);
+    move(++line,4);
     printw("F2: get potentiometer value for reference temperature");
-    move(4,3);
+    move(++line,4);
     printw("F3: set reference temperature");
-    move(5,3);
+    move(++line,4);
     printw("F4: set hysteresis");
-    move(6,2);
-    printw("ESC: exit");
+    move(++line,5);
+    printw("^: up");
+    move(++line,5);
+    printw("v: down");
+    move(++line,1);
+    printw("Enter: select");
+    move(++line,3);
+    printw("Esc: exit");
     refresh();
 }
+
+void print_instructions(int line)
+{
+    move(line,1);
+    printw("Instructions:");
+    move(++line,4);
+    printw("1 - select f2 or f3 to set the reference temperature");
+    move(++line,4);
+    printw("2 - select f4 to set the hysteresis");
+}
+
 
 WINDOW **create_items(int column, int number_items, int first_value)  //Desenha os ítens do menu quando as teclas F1 ou F2 for pressionada
 {
@@ -104,10 +111,6 @@ float scrollmenu(WINDOW **menu_items, int number_items, int column, int first_va
             wnoutrefresh(menu_items[selected+1]);
             doupdate();
         }
-        else if (key==ESCAPE)
-        {
-            return -1.0f;
-        }
         else if (key==ENTER)
         {
             return (float)(selected+first_value);
@@ -115,7 +118,7 @@ float scrollmenu(WINDOW **menu_items, int number_items, int column, int first_va
     }
 }
 
-int main()
+void initialize_window ()
 {
     //Inicializações---------------------------------------------
     initscr();      //Inicializando a ncurses
@@ -130,58 +133,84 @@ int main()
     curs_set(0);  //Faz com que o cursor físico fique invisível.
     noecho();     //Impede que as teclas apareçam na tela
     keypad(stdscr,TRUE);  //Ativa as teclas de função
-    //-----------------------------------------------------------
- 
-    WINDOW **temperature_values, **hysteresis_values;
-    WINDOW *menu_bar,*mensagem;
-    
     bkgd(COLOR_PAIR(1));
+    //-----------------------------------------------------------
 
-    menu_bar=subwin(stdscr,NLINES_MENU, COLS, FIRST_LINE, FIRST_COLUMN);
-    create_menu_bar(menu_bar);
+    menu();
+    windows.message=subwin(stdscr,1,COLS/2,23,1);
+}
 
-
-    mensagem=subwin(stdscr,1,79,23,1);
-
-    print_commands();
-
-    float reference_temperature = 30.0f;
-    float hysteresis;
+void *input_values (void *args)
+{
+    Data *data = (Data *)args;
+    WINDOW **temperature_values, **hysteresis_values;
     int key;
-
-
-    do {
-        key=getch();
-        werase(mensagem);
-        wrefresh(mensagem);
-        if (key==KEY_F(3))
+    while (1)
+    {
+        key = getch();
+        werase(windows.message);
+        wrefresh(windows.message);
+        switch (key)
         {
+        case KEY_F(2):
+            data->potentiometer = 1;
+            wprintw(windows.message,"Get potentiometer value mode",data->reference_temperature);
+            touchwin(stdscr);
+            refresh();
+            break;
+        case KEY_F(3):
+            data->potentiometer = 0;
             temperature_values = create_items(0, NTEMPERATURE_VALUES, TEMPERATURE_FIRST_VALUE);
-            reference_temperature = scrollmenu(temperature_values, NTEMPERATURE_VALUES, FIRST_COLUMN, TEMPERATURE_FIRST_VALUE);
+            data->reference_temperature = scrollmenu(temperature_values, NTEMPERATURE_VALUES, FIRST_COLUMN_MENU, TEMPERATURE_FIRST_VALUE);
             deletaritensmenu(temperature_values, NTEMPERATURE_VALUES);
-            if (reference_temperature<0.0f)
-                wprintw(mensagem,"Invalid Reference Temperature");
-            else
-                wprintw(mensagem,"Reference Temperature: %.2f",reference_temperature);
+            wprintw(windows.message,"Updated Reference Temperature: %.2f oC",data->reference_temperature);
             touchwin(stdscr);
             refresh();
-        }
-        else if (key==KEY_F(4))
-        {
+            break;
+        
+        case KEY_F(4):
             hysteresis_values = create_items(20, NHYSTERESIS_VALUES, HYSTERESIS_FIRST_VALUE);
-            hysteresis = scrollmenu(hysteresis_values, NHYSTERESIS_VALUES, 20, HYSTERESIS_FIRST_VALUE);
+            data->hysteresis = scrollmenu(hysteresis_values, NHYSTERESIS_VALUES, 20, HYSTERESIS_FIRST_VALUE);
             deletaritensmenu(hysteresis_values, NHYSTERESIS_VALUES);
-            if (hysteresis < 0.0f)
-                wprintw(mensagem,"Invalid Hysteresis");
-            else
-                wprintw(mensagem,"Hysteresis: %.2f", hysteresis);
+            wprintw(windows.message,"Updated Hysteresis: %.2f oC", data->hysteresis);
             touchwin(stdscr);
             refresh();
+            break;
+        case ESCAPE:
+            pthread_exit(0);
+            break;
         }
-    } while (key!=ESCAPE);
+    }
+}
 
-    delwin(menu_bar);
-    delwin(mensagem);
+void *output_values (void *args)
+{
+    Data *data = (Data *)args;
+    int line = 2;
+    
+    move(line,COLS/2);
+    printw("Internal Temperature: %.2f oC", data->internal_temperature);
+    move(++line,COLS/2);
+    printw("External Temperature: %.2f oC", data->external_temperature);
+    move(++line,COLS/2);
+    move(line,COLS/2);
+    printw("Reference Temperature: %.2f oC", data->reference_temperature);
+    move(++line,COLS/2);
+    printw("Hysteresis: %.2f oC", data->hysteresis);
+    refresh();
+    return NULL;
+}
+
+void end_window() 
+{
+    delwin(windows.menu_bar);
+    delwin(windows.message);
     endwin();
-    return 0;
+}
+
+void menu ()
+{
+    create_menu_bar();
+    print_commands(FIRST_LINE_COMMANDS);
+    print_instructions(FIRST_LINE_INSTRUCTIONS);
 }

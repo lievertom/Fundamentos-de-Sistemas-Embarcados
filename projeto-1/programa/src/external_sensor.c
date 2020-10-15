@@ -10,6 +10,8 @@
 #include <fcntl.h>
 #include <time.h>
 
+#include "data.h"
+
 /******************************************************************************/
 /*! @file bme280_interface.c
  * @brief Interface for sensor driver 
@@ -19,6 +21,7 @@
 /****************************************************************************/
 /*!                         Macros                                       */
 #define BUS "/dev/i2c-1" // sensor bus
+
 
 /****************************************************************************/
 
@@ -147,11 +150,16 @@ void initialize_external_sensor()
     }
 }
 
-float get_external_temperature()
+void *get_external_temperature(void *args)
 {
+    Data *data = (Data *) args;
     struct bme280_data comp_data;
     /* Delay while the sensor completes a measurement */
     user_delay_us(70, device.intf_ptr);
     bme280_get_sensor_data(BME280_ALL, &comp_data, &device);
-    return comp_data.temperature;
+    if (comp_data.temperature > 0.0f)
+    {
+        data->external_temperature = comp_data.temperature;
+    }
+    return NULL;
 }

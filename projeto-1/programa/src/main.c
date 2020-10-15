@@ -1,10 +1,12 @@
+#include <unistd.h>
 #include <signal.h>
 #include <stdio.h>
 
 #include "external_sensor.h"
-#include "uart.h"
 #include "actuator.h"
-#include "data.h"
+#include "window.h"
+#include "thread.h"
+#include "uart.h"
 #include "lcd.h"
 
 /*!
@@ -12,30 +14,20 @@
  */
 int main(int argc, char* argv[])
 {   
-    signal(SIGINT, shut_down);
-    initialize_lcd();
-    initialize_actuators();
+    signal(SIGALRM, alarm_handler); 
+    signal(SIGTERM, sig_handler);
+    signal(SIGKILL, sig_handler);
+    signal(SIGSTOP, sig_handler);
+    signal(SIGINT, sig_handler);
+
     initialize_external_sensor();
-    struct Data data;
-    while(1)
-    {   
-        int a;
-        scanf("%d", &a);
-        if (a == 2) on_off_actuators(ON, OFF);
-        else on_off_actuators(OFF, ON);
-        float te = get_external_temperature();
-        float ti = uart(INTERNAL_TEMPERATURE);
-        float tr = uart(REFERENCE_TEMPERATURE);
+    initialize_actuators();
+    initialize_window();
+    initialize_lcd();
+    
+    initialize_threads();
 
-        save_data(&ti, &te, &tr);
-        print_lcd(ti, te, tr, 1);
-
-
-        printf ("TE: %.2f\n", te);
-        printf ("TI: %.2f\n", ti);
-        printf ("TR: %.2f\n", tr);
-    }
-
+    sig_handler(SIGINT);
 
     return 0;
 }

@@ -12,8 +12,9 @@ void date_hour (char * date, char * hour)
     strftime(hour, HOUR_SIZE, "%X", timeinfo);
 }
 
-void save_data (float *internal_temperature, float *external_temperature, float *reference_temperature)
+void *save_data (void *args)
 {
+    Data *data = (Data *) args;
     char date[DATE_SIZE];
     char hour[HOUR_SIZE];
 
@@ -36,7 +37,8 @@ void save_data (float *internal_temperature, float *external_temperature, float 
     }
 
     /* Store data mean rounded with one decimal place */
-    fprintf(file, "%s, %s, %0.2f, %0.2f, %0.2f,\n", date, hour, *internal_temperature, *external_temperature, *reference_temperature);
+    fprintf(file, "%s, %s, %0.2f, %0.2f, %0.2f,\n", date, hour, data->internal_temperature, data->external_temperature, data->reference_temperature);
 
     fclose(file);
+    return NULL;
 }

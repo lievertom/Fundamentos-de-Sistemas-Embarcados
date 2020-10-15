@@ -8,24 +8,6 @@
 #define OFF 1
 
 /*!
- * @brief Function to configure the pins
- *
- * @return void
- *
- */
-// void configuration();
-
-/*!
- *  @brief Function to handle preogram interuption.
- *
- *  @param[in] signal        :  interruption signal
- * 
- *  @return void.
- *
- */
-void shut_down(int signal);
-
-/*!
  * @brief Function to initialize the sensor
  *
  * @return void
@@ -34,5 +16,7 @@ void shut_down(int signal);
 void initialize_actuators();
 
 void on_off_actuators(int fan, int resistance);
+
+void *actuators_control (void *args);
 
 #endif /* ACTUATOR_H_ */
