@@ -25,7 +25,7 @@ void sig_handler(int signal);
 void alarm_handler(int signum);
 
 /*!
- *  @brief Function to init the principal thread
+ *  @brief Function to init the main thread
  *
  *  @return void.
  *

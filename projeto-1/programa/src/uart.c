@@ -1,30 +1,31 @@
+/******************************************************************************/
+/*                       Header includes                                      */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>         // Used for UART
-#include <fcntl.h>          // Used for UART
-#include <termios.h>        // Used for UART
+#include <unistd.h>         
+#include <fcntl.h>          
+#include <termios.h>        
 
 #include "data.h"
+
+/******************************************************************************/
+/*! @file uart.c
+ * @brief Interface for uart
+ */
 #include "uart.h"
 
-#define INT_ERROR -1
-#define FLOAT_ERROR -1.0f
-#define BUS "/dev/serial0"
+/****************************************************************************/
+/*!                         Functions                                       */
 
+/*!
+ * @brief Function used to uart setup.
+ */
 int setup_uart()
 {
     int uart0_filestream = INT_ERROR;
-    uart0_filestream = open(BUS, O_RDWR | O_NOCTTY | O_NDELAY);
-
-    // if (uart0_filestream == INT_ERROR)
-    // {
-    //     printf("Erro - Não foi possível iniciar a UART.\n");
-    // }
-    // else
-    // {
-    //     printf("UART inicializada!\n");
-    // }
+    uart0_filestream = open(PATH, O_RDWR | O_NOCTTY | O_NDELAY);
 
     struct termios options;
     tcgetattr(uart0_filestream, &options);
@@ -38,36 +39,27 @@ int setup_uart()
     return uart0_filestream;
 }
 
+/*!
+ * @brief Function used to write in uart.
+ */
 ssize_t write_uart(int file_descriptor, const void *buf, size_t count)
 {
     ssize_t message_size = write(file_descriptor, buf, count);
-    // if(message_size < 0)
-    // {
-    //     printf("Houve um erro no envio da mensagem à UART!\n");
-    // } 
-    // else 
-    // {
-    //     printf("%03d bytes escritos na UART!\n", message_size);
-    // }
-
     return message_size;
 }
 
+/*!
+ * @brief Function used to read from uart.
+ */
 ssize_t read_uart(int file_descriptor, void *buf, size_t count)
 {
     ssize_t response_size = read(file_descriptor, buf, count);
-    // if(response_size == INT_ERROR)
-    // {
-    //     printf("Houve um erro na leitura da mensagem da UART!\n");
-    // }
-    // else 
-    // {
-    //     printf("%03d bytes lidos da UART!\n", response_size);
-    // }
-
     return response_size;
 }
 
+/*!
+ * @brief Function used get the potentiometer value or internal temperature.
+ */
 float ask_float(int uart0_filestream, unsigned char * command)
 {
     const unsigned char matricula[] = {9, 2, 5, 1};
@@ -85,6 +77,9 @@ float ask_float(int uart0_filestream, unsigned char * command)
     return response;
 }
 
+/*!
+ *  @brief Thread function that access uart to update the internal temperature and potentiometer values
+ */
 void  *uart (void *args)
 {
     float response;

@@ -1,5 +1,5 @@
 /******************************************************************************/
-/*!                         System header files                               */
+/*                       Header includes                                      */
 #include <linux/i2c-dev.h>
 #include <sys/ioctl.h>
 #include <string.h>
@@ -10,20 +10,18 @@
 #include <fcntl.h>
 #include <time.h>
 
+#include "bme280.h"
 #include "data.h"
 
 /******************************************************************************/
-/*! @file bme280_interface.c
+/*! @file external_sensor.c
  * @brief Interface for sensor driver 
  */
 #include "external_sensor.h"
 
-/****************************************************************************/
-/*!                         Macros                                       */
-#define BUS "/dev/i2c-1" // sensor bus
-
 
 /****************************************************************************/
+/*!                         global statement                                */
 
 struct identifier id;
 struct bme280_dev device;

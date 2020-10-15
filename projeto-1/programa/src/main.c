@@ -1,3 +1,6 @@
+/******************************************************************************/
+/*                       Header includes                                      */
+
 #include <unistd.h>
 #include <signal.h>
 #include <stdio.h>
@@ -8,6 +11,9 @@
 #include "thread.h"
 #include "uart.h"
 #include "lcd.h"
+
+/****************************************************************************/
+/*                            Main                                          */
 
 /*!
  * @brief This function starts execution of the program.

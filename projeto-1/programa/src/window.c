@@ -1,3 +1,6 @@
+/******************************************************************************/
+/*                       Header includes                                      */
+
 #include <curses.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,18 +8,34 @@
 #include <unistd.h>
 
 #include "data.h"
+
+/******************************************************************************/
+/*! @file window.c
+ * @brief Inteface to window
+ */
 #include "window.h"
-    
-void create_menu_bar()  //Função encarregada de criar um menu em nosso sistema
+
+/****************************************************************************/
+/*!                        Global Statements                                */
+
+Windows windows;
+
+/****************************************************************************/
+/*!                         Functions                                       */
+
+/*!
+ * @brief Function used to create the menu bar
+ */  
+void create_menu_bar()
 {
     WINDOW *menu_bar = windows.menu_bar;
     menu_bar=subwin(stdscr,NLINES_MENU, COLS, FIRST_LINE_MENU, FIRST_COLUMN_MENU);
-    wbkgd(menu_bar,COLOR_PAIR(2));    //Alterando a cor de fundo do menu
-    waddstr(menu_bar,"Temperature");    //Esta função escreve os nomes dos menus
-    wattron(menu_bar,COLOR_PAIR(3));  //Alterando o par de cores para 3
+    wbkgd(menu_bar,COLOR_PAIR(2));    
+    waddstr(menu_bar,"Temperature");  
+    wattron(menu_bar,COLOR_PAIR(3));
     waddstr(menu_bar," F3 ");
-    wattroff(menu_bar,COLOR_PAIR(3)); //Retornando para o par de cor 2.
-    wmove(menu_bar,0,20);            // Posiciona o cursor na linha 0, coluna 20
+    wattroff(menu_bar,COLOR_PAIR(3)); 
+    wmove(menu_bar,0,20);       
     waddstr(menu_bar,"Hysteresis");
     wattron(menu_bar,COLOR_PAIR(3));
     waddstr(menu_bar," F4 ");
@@ -24,6 +43,9 @@ void create_menu_bar()  //Função encarregada de criar um menu em nosso sistema
     refresh();
 }
 
+/*!
+ * @brief Function used to print the commands
+ */ 
 void print_commands(int line)
 {
     move(line,1);
@@ -45,6 +67,9 @@ void print_commands(int line)
     refresh();
 }
 
+/*!
+ * @brief Function used to print the instructions
+ */ 
 void print_instructions(int line)
 {
     move(line,1);
@@ -55,8 +80,10 @@ void print_instructions(int line)
     printw("2 - select f4 to set the hysteresis");
 }
 
-
-WINDOW **create_items(int column, int number_items, int first_value)  //Desenha os ítens do menu quando as teclas F1 ou F2 for pressionada
+/*!
+ * @brief Function used to draws menu items when the F3 or F4 keys are pressed
+ */ 
+WINDOW **create_items(int column, int number_items, int first_value)
 {
     WINDOW **menu_items;
     menu_items=(WINDOW **)malloc((number_items+1)*sizeof(WINDOW *));
@@ -79,7 +106,10 @@ WINDOW **create_items(int column, int number_items, int first_value)  //Desenha 
     return menu_items;
 }
 
-void deletaritensmenu(WINDOW **menu_items, int number_items) //Apaga os ítens da menu criado pela função acima
+/*!
+ * @brief Function that delet the menu items 
+ */ 
+void deletaritensmenu(WINDOW **menu_items, int number_items)
 {
     for (int i = 0; i <= number_items; i++)
     {
@@ -88,8 +118,10 @@ void deletaritensmenu(WINDOW **menu_items, int number_items) //Apaga os ítens d
     free(menu_items);
 }
 
-
-float scrollmenu(WINDOW **menu_items, int number_items, int column, int first_value) //Permite fazer scroll entre e dentro dos menus
+/*!
+ * @brief Function used to scroll
+ */ 
+float scrollmenu(WINDOW **menu_items, int number_items, int column, int first_value) 
 {
     int key;
     int selected=0;
@@ -118,28 +150,41 @@ float scrollmenu(WINDOW **menu_items, int number_items, int column, int first_va
     }
 }
 
+/*!
+ * @brief Function that create the menu 
+ */ 
+void menu ()
+{
+    create_menu_bar();
+    print_commands(FIRST_LINE_COMMANDS);
+    print_instructions(FIRST_LINE_INSTRUCTIONS);
+}
+
+/*!
+ * @brief Function that initialize the window 
+ */ 
 void initialize_window ()
 {
-    //Inicializações---------------------------------------------
-    initscr();      //Inicializando a ncurses
-    start_color();  //Tornando o uso das cores possíveis
-
-    //Definição dos pares de cores
+    initscr();      //Init the ncurses
+    start_color();
+    /* Definition color pairs*/
     init_pair(1,COLOR_CYAN,COLOR_BLACK);
     init_pair(2,COLOR_BLACK,COLOR_CYAN);
     init_pair(3,COLOR_RED,COLOR_CYAN);  
 
     cbreak(); // Disable line buffering, gimme every thing
-    curs_set(0);  //Faz com que o cursor físico fique invisível.
-    noecho();     //Impede que as teclas apareçam na tela
-    keypad(stdscr,TRUE);  //Ativa as teclas de função
+    curs_set(0);  // invisible cursor
+    noecho();   
+    keypad(stdscr,TRUE);  // active the function keypads 
     bkgd(COLOR_PAIR(1));
-    //-----------------------------------------------------------
 
     menu();
     windows.message=subwin(stdscr,1,COLS/2,23,1);
 }
 
+/*!
+ *  @brief Thread function to user input 
+ */
 void *input_values (void *args)
 {
     Data *data = (Data *)args;
@@ -177,12 +222,15 @@ void *input_values (void *args)
             refresh();
             break;
         case ESCAPE:
-            pthread_exit(0);
+            return NULL;
             break;
         }
     }
 }
 
+/*!
+ *  @brief Thread function that shows the values ​​on the screen
+ */
 void *output_values (void *args)
 {
     Data *data = (Data *)args;
@@ -201,16 +249,12 @@ void *output_values (void *args)
     return NULL;
 }
 
+/*!
+ *  @brief Thread function that ends the window
+ */
 void end_window() 
 {
     delwin(windows.menu_bar);
     delwin(windows.message);
     endwin();
-}
-
-void menu ()
-{
-    create_menu_bar();
-    print_commands(FIRST_LINE_COMMANDS);
-    print_instructions(FIRST_LINE_INSTRUCTIONS);
 }

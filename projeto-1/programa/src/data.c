@@ -1,6 +1,22 @@
+/******************************************************************************/
+/*                       Header includes                                      */
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+
+/******************************************************************************/
+/*! @file data.c
+ * @brief Data structure to save the data
+ */
 #include <data.h>
 
+/****************************************************************************/
+/*!                         Functions                                       */
 
+/*!
+ * @brief This function get date and hour of system.
+ */
 void date_hour (char * date, char * hour)
 {
     time_t rawtime;
@@ -12,6 +28,9 @@ void date_hour (char * date, char * hour)
     strftime(hour, HOUR_SIZE, "%X", timeinfo);
 }
 
+/*!
+ *  @brief Thread function that saves data
+ */
 void *save_data (void *args)
 {
     Data *data = (Data *) args;
