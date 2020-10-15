@@ -1,13 +1,11 @@
 #ifndef THREAD_H_
 #define THREAD_H_
 
-#include "data.h"
-
 /****************************************************************************/
 /*!                         Functions                                       */
 
 /*!
- *  @brief Function to handle preogram interuption.
+ *  @brief Function to handle program interuption.
  *
  *  @param[in] signal        :  interruption signal
  * 
@@ -16,8 +14,22 @@
  */
 void sig_handler(int signal);
 
+/*!
+ *  @brief Function to handle program interuption.
+ *
+ *  @param[in] signal        :  interruption signal
+ * 
+ *  @return void.
+ *
+ */
 void alarm_handler(int signum);
 
+/*!
+ *  @brief Function to init the principal thread
+ *
+ *  @return void.
+ *
+ */
 void initialize_threads();
 
 #endif /* THREAD_H_ */

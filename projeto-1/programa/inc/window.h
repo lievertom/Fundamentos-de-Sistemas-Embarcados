@@ -1,10 +1,13 @@
 #ifndef WINDOW_H_
 #define WINDOW_H_
 
+/******************************************************************************/
+/*                       Header includes                                      */
 #include <curses.h>
 
+/****************************************************************************/
+/*!                              Macros                                     */
 
-//Constastes das teclas ENTER e ESCAPE.
 #define ENTER                   10
 #define ESCAPE                  27
  
@@ -21,19 +24,51 @@
 #define FIRST_LINE_COMMANDS     2
 #define FIRST_LINE_INSTRUCTIONS 11
 
-
+/****************************************************************************/
+/*!                            Structs                                      */
 typedef struct Windows
 {
     WINDOW *menu_bar;
     WINDOW *message;
 } Windows;
 
-Windows windows;
+/****************************************************************************/
+/*!                         Functions                                       */
 
+/*!
+ *  @brief function that initialize window
+ *
+ *  @return void
+ *
+ */
 void initialize_window ();
+
+/*!
+ *  @brief Thread function that shows the values ​​on the screen
+ *
+ * @param[in] args       : Pointer to access the data structure
+ *
+ *  @return void
+ *
+ */
 void *output_values (void *args);
+
+/*!
+ *  @brief Thread function to user input 
+ *
+ * @param[in] args       : Pointer to access the data structure
+ *
+ *  @return void
+ *
+ */
 void *input_values (void *args);
+
+/*!
+ *  @brief Thread function that ends the window
+ *
+ *  @return void
+ *
+ */
 void end_window(); 
-void menu ();
 
 #endif /* WINDOW_H_ */
