@@ -57,6 +57,13 @@ Maiores informações e requisitos do trabalho disponíveis em:
      ↓ : para baixo
      ↵ : selecionar
     Esc: fechar
+    
+## Instruções
+
+1. primeiro defina o valor da temperatua de referência : __F2__ or __F3__;
+2. depois defina o valor da histerese : __F4__.
+
+*Obs.: O arquivo de log fica salvo em* `dat/data.csv`.
 
 ## Autor
 
