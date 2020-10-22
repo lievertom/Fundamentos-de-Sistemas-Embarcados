@@ -25,6 +25,8 @@
 #define NAIR                    2
 #define BUTTON_SIZE             12
 
+#define AIR_OFF                 0.0f
+
 /****************************************************************************/
 /*!                            Structs                                      */
 typedef struct Windows
@@ -33,14 +35,12 @@ typedef struct Windows
     WINDOW *message;
 } Windows;
 
-
 typedef struct Actuators
 {
-    int lamps[NLAMPS];
-    int alarm;
+    unsigned char lamps[NLAMPS];
+    unsigned char alarm;
+    float air[NAIR];
 } Actuators;
-
-
 
 /****************************************************************************/
 /*!                         Functions                                       */

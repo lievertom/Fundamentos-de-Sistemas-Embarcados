@@ -66,7 +66,7 @@ void initialize_threads()
         exit(1);
     }
 
-    ualarm(500000, 500000);
+    alarm(1);
 
     pthread_join(input_thread, NULL);
 }

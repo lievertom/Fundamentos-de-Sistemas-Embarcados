@@ -134,9 +134,9 @@ void print_commands(int line)
     move(++line,4);
     printw("F5: turn on or off bedroom 2 lamp");
     move(++line,4);
-    printw("F6: set bedroom 1 temperature");
+    printw("F6: set bedroom 1 temperature or Esc to turn off");
     move(++line,4);
-    printw("F7: set bedroom 2 temperature");
+    printw("F7: set bedroom 2 temperature or Esc to turn off");
     move(++line,4);
     printw("F8: turn on or off alarm");
     move(++line,5);
@@ -229,6 +229,10 @@ float scrollmenu(WINDOW **menu_items, int number_items, int column, int first_va
         else if (key==ENTER)
         {
             return (float)(selected+first_value);
+        }
+        else if (key==ESCAPE)
+        {
+            return AIR_OFF;
         }
     }
 }
@@ -379,6 +383,8 @@ void *output_values ()
     printw("Presence Sensor:");
     move(++line,BUTTON_SIZE*6+2);
     printw("Window:");
+    move(++line,BUTTON_SIZE*6+2);
+    printw("air conditioning:");
     
     line += 2;
     move(line,BUTTON_SIZE*6);
@@ -391,6 +397,8 @@ void *output_values ()
     printw("Presence Sensor:");
     move(++line,BUTTON_SIZE*6+2);
     printw("Window:");
+    move(++line,BUTTON_SIZE*6+2);
+    printw("air conditioning:");
 
     refresh();
     return NULL;
