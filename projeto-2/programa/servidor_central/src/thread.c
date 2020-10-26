@@ -5,9 +5,10 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include "tcp_server.h"
-#include "window.h"
 #include "data.h"
+#include "alarm.h"
+#include "window.h"
+#include "tcp_server.h"
 
 /******************************************************************************/
 /*! @file thread.c
@@ -23,6 +24,7 @@ pthread_t input_thread;
 pthread_t receive_thread;
 pthread_t send_thread;
 pthread_t log_thread;
+pthread_t alarm_thread;
 
 Data data;
 
@@ -43,7 +45,11 @@ void store_data (char *message)
  */
 void alarm_handler(int signum)
 {   
+    alarm(1);
     pthread_join(output_thread, NULL);
+    if (!data.alarm)
+        pthread_create(&alarm_thread, NULL, play_alarm, (void *) &data);        
+
     // pthread_join(send_thread, NULL);
 
     pthread_create(&output_thread, NULL, output_values, (void *) &data);        
@@ -77,7 +83,6 @@ void initialize_threads()
     data.open_sensor = 255;
     data.presence_sensor = 255;
     data.client_socket = 0;
-
 
     printf("waiting connection ...\n");
 

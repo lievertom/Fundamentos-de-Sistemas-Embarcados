@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include "data.h"
+#include "alarm.h"
 #include "thread.h"
 
 /******************************************************************************/
@@ -62,7 +63,7 @@ void create_button_lamp ()
 
 void create_button_air()
 {
-    wmove(menu_bar,0,(NLAMP)*BUTTON_SIZE);
+    wmove(menu_bar,0,NLAMP*BUTTON_SIZE);
     wattron(menu_bar,COLOR_PAIR(2));
     waddstr(menu_bar, "  AC  ");
     wattron(menu_bar,COLOR_PAIR(5));
@@ -113,17 +114,7 @@ bool switch_alarm (unsigned char key, Data *data, char *buffer)
 {
     if (data->alarm)
     {
-        bool auxiliary = false;
-
-        for (int i; i < NOPEN_SENSOR; i++)
-            if (!(data->open_sensor&1<<i))
-                auxiliary = true;
-        
-        for (int i; i < NPRESENCE_SENSOR; i++)
-            if (!(data->presence_sensor&1<<i))
-                auxiliary = true;
-
-        if (auxiliary)
+        if (alarm_control(data))
         {
             sprintf(buffer, "close doors and windows before activating the alarm!");
             return false;
@@ -300,7 +291,7 @@ void initialize_window ()
     bkgd(COLOR_PAIR(1));
 
     menu();
-    windows.message=subwin(stdscr,1,COLS/2,23,1);
+    windows.message=subwin(stdscr,1,BUTTON_SIZE*5,23,1);
 }
 
 /*!
@@ -385,55 +376,55 @@ void *output_values (void *args)
     Data *data = (Data *) args;
     int line = 2;
     
-    move(line,BUTTON_SIZE*6);
+    move(line,BUTTON_SIZE*5);
     printw("Room");
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("Temperature: %.2f oC", data->temperature[1]);
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("Humidity: %.2f", data->humidity[1]);
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("Presence Sensor: %s", message[4+(data->presence_sensor&1 ? 1 : 0)]);
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("Window: %s", message[2+(data->open_sensor&(1<<3) ? 1 : 0)]);
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("Door: %s", message[2+(data->open_sensor&(1<<2) ? 1 : 0)]);
     
     line += 2;
-    move(line,BUTTON_SIZE*6);
+    move(line,BUTTON_SIZE*5);
     printw("Kitchen");
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("Temperature: %.2f oC", data->temperature[0]);
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("Humidity: %.2f", data->humidity[0]);
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("Presence Sensor: %s", message[4+(data->presence_sensor&(1<<1) ? 1 : 0)]);
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("Window: %s", message[2+(data->open_sensor&(1<<1) ? 1 : 0)]);
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("Door: %s", message[2+(data->open_sensor&1 ? 1 : 0)]);
     
     line += 2;
-    move(line,BUTTON_SIZE*6);
+    move(line,BUTTON_SIZE*5);
     printw("Bedroom 1");
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("air conditioning: %s", message[(data->air_turn&1 ? 1 : 0)]);
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("Temperature: %.2f oC", data->temperature[2]);
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("Humidity: %.2f", data->humidity[2]);
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("Window: %s", message[2+(data->open_sensor&(1<<4) ? 1 : 0)]);
     
     line += 2;
-    move(line,BUTTON_SIZE*6);
+    move(line,BUTTON_SIZE*5);
     printw("Bedroom 2");
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("air conditioning: %s", message[(data->air_turn&(1<<1) ? 1 : 0)]);
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("Temperature: %.2f oC", data->temperature[3]);
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("Humidity: %.2f", data->humidity[3]);
-    move(++line,BUTTON_SIZE*6+2);
+    move(++line,BUTTON_SIZE*5+2);
     printw("Window: %s", message[2+(data->open_sensor&(1<<5) ? 1 : 0)]);
     sleep(1);
     refresh();
