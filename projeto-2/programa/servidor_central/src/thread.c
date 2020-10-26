@@ -22,6 +22,7 @@ pthread_t output_thread;
 pthread_t input_thread;
 pthread_t receive_thread;
 pthread_t send_thread;
+pthread_t log_thread;
 
 Data data;
 
@@ -29,12 +30,13 @@ Data data;
 /*!                         Functions                                       */
 
 /*!
- * @brief Function used to reset the threads.
+ * @brief Function used to save log.
  */
-// void reset ()
-// {
-//     pthread_cancel(output_thread);
-// }
+void store_data (char *message)
+{
+    pthread_join(log_thread, NULL);
+    pthread_create(&log_thread, NULL, save_data, (void *) message);
+}
 
 /*!
  * @brief Function to handle program interuption.
@@ -42,10 +44,10 @@ Data data;
 void alarm_handler(int signum)
 {   
     pthread_join(output_thread, NULL);
-    pthread_join(send_thread, NULL);
+    // pthread_join(send_thread, NULL);
 
     pthread_create(&output_thread, NULL, output_values, (void *) &data);        
-    pthread_create(&send_thread, NULL, submit, (void *) &data);        
+    // pthread_create(&send_thread, NULL, submit, (void *) &data);        
 }
 
 /*!
@@ -54,12 +56,13 @@ void alarm_handler(int signum)
 void sig_handler (int signal)
 {
     alarm(0);
-    pthread_cancel(receive_thread);
-    pthread_join(send_thread, NULL);
+    // pthread_cancel(receive_thread);
+    // pthread_join(send_thread, NULL);
     pthread_join(output_thread, NULL);
     end_window();
     close(data.client_socket);    
     close(data.server_socket);
+    printf("exit, log saved to dat/data.csv\n");
     exit(0);
 }
 
@@ -68,8 +71,7 @@ void sig_handler (int signal)
  */
 void initialize_threads()
 {
-    data.alarm[0] = 1;
-    data.alarm[1] = 1;
+    data.alarm = 1;
     data.lamp = 255;
     data.air_turn = 255;
     data.open_sensor = 255;
@@ -79,7 +81,7 @@ void initialize_threads()
 
     printf("waiting connection ...\n");
 
-    initialize_tcp_server(&data);
+    // initialize_tcp_server(&data);
     initialize_window();
     
     if (pthread_create(&input_thread, NULL, input_values, (void *) &data))
@@ -88,11 +90,11 @@ void initialize_threads()
         exit(1);
     }
 
-    if(pthread_create(&receive_thread, NULL, receive, (void *) &data))
-    {
-        printf("Fail to create receive_thread\n");
-        exit(2);
-    }
+    // if(pthread_create(&receive_thread, NULL, receive, (void *) &data))
+    // {
+    //     printf("Fail to create receive_thread\n");
+    //     exit(2);
+    // }
 
     alarm(1);
 

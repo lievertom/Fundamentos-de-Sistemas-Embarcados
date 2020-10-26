@@ -4,6 +4,9 @@
 /****************************************************************************/
 /*!                         Functions                                       */
 
+
+void store_data(char *message);
+
 /*!
  *  @brief Function to handle program interuption.
  *

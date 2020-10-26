@@ -9,11 +9,11 @@
 /****************************************************************************/
 /*!                              Macros                                     */
 
-#define PATH_DATA "dat/data.csv"
-#define DATE_SIZE 11
-#define HOUR_SIZE 9
+#define PATH_DATA               "dat/data.csv"
 
-#define NAIR                    2
+#define DATE_SIZE               11
+#define HOUR_SIZE               9
+
 #define NLAMP                   4
 #define NSENSOR                 4
 #define NOPEN_SENSOR            6
@@ -21,33 +21,33 @@
 
 #define AIR_OFF                 0.0f
 
+#define DELAY_ALARM             10
+
 /****************************************************************************/
 /*!                            Structs                                      */
 
 typedef struct Data 
 {
-    bool alarm[2];
+    bool alarm;
     unsigned char lamp;
     unsigned char air_turn;
     unsigned char open_sensor;
     unsigned char presence_sensor;
     float humidity[NSENSOR];
     float temperature[NSENSOR];
-    float air_reference_temperature[NAIR];
+    float air_reference_temperature;
     int server_socket;
     int client_socket;
 } Data;
 
 typedef struct Send
 {
-    bool alarm;
     unsigned char lamp;
-    float air_reference_temperature[NAIR];
+    float air_reference_temperature;
 } Send;
 
 typedef struct Receive
 {
-    bool alarm;
     unsigned char air_turn;
     unsigned char open_sensor;
     unsigned char presence_sensor;

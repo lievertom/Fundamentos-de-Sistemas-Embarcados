@@ -30,7 +30,6 @@ void *receive(void *args)
     {
         recv(data->client_socket, &data_receive, sizeof(data_receive), 0);
         
-        data->alarm[1] = data_receive.alarm;
         data->air_turn = data_receive.air_turn;
         data->open_sensor = data_receive.open_sensor;
         data->presence_sensor = data_receive.presence_sensor;
@@ -49,9 +48,7 @@ void *submit(void *args)
     Send data_send;
 
     data_send.lamp = data->lamp;
-    data_send.alarm = data->alarm[0];
-    for (int i = 0; i < NAIR; i++)
-        data_send.air_reference_temperature[i] = data->air_reference_temperature[i];
+    data_send.air_reference_temperature = data->air_reference_temperature;
 
     send(data->client_socket, &data_send, sizeof(data_send), 0);
     return NULL;

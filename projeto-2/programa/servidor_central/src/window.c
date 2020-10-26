@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include "data.h"
+#include "thread.h"
 
 /******************************************************************************/
 /*! @file window.c
@@ -22,15 +23,12 @@ Windows windows;
 WINDOW *menu_bar;
 
 const char *key_function[] = {
-    " F0 ",
-    " F1 ",
     " F2 ",
     " F3 ",
     " F4 ",
     " F5 ",
     " F6 ",
-    " F7 ",
-    " F8 "
+    " F7 "
 };
 
 const char *message[] = 
@@ -49,71 +47,96 @@ const char *message[] =
 
 void create_button_lamp ()
 {
-    for (int i = 1; i <= NLAMP; i++)
+    for (int i = 0; i < NLAMP; i++)
     {
+        wmove(menu_bar,0,i*BUTTON_SIZE);
         char string[] = "lamp x";
-        string[5] = '0'+i;
+        string[5] = '1'+i;
         wattron(menu_bar,COLOR_PAIR(2));
         waddstr(menu_bar, string);
         wattron(menu_bar,COLOR_PAIR(3));
-        waddstr(menu_bar, key_function[i+1]);
+        waddstr(menu_bar, key_function[i]);
         wattroff(menu_bar,COLOR_PAIR(3));
-        wmove(menu_bar,0,i*BUTTON_SIZE);
     }
 }
 
 void create_button_air()
 {
-    for (int i = 1; i <= NAIR; i++)
-    {
-        char string[] = "air x ";
-        string[4] = '0'+i;
-        wattron(menu_bar,COLOR_PAIR(2));
-        waddstr(menu_bar, string);
-        wattron(menu_bar,COLOR_PAIR(5));
-        waddstr(menu_bar, key_function[i+1+NLAMP]);
-        wattroff(menu_bar,COLOR_PAIR(5));
-        wmove(menu_bar,0,(NLAMP+i)*BUTTON_SIZE);
-    }
+    wmove(menu_bar,0,(NLAMP)*BUTTON_SIZE);
+    wattron(menu_bar,COLOR_PAIR(2));
+    waddstr(menu_bar, "  AC  ");
+    wattron(menu_bar,COLOR_PAIR(5));
+    waddstr(menu_bar, key_function[NLAMP]);
+    wattroff(menu_bar,COLOR_PAIR(5));
 } 
 
 void create_button_alarm()
 {
+    wmove(menu_bar,0,(NLAMP+1)*BUTTON_SIZE);
     wattron(menu_bar,COLOR_PAIR(2));
     waddstr(menu_bar, "alarm ");
     wattron(menu_bar,COLOR_PAIR(3));
-    waddstr(menu_bar, key_function[8]);
+    waddstr(menu_bar, key_function[NLAMP+1]);
     wattroff(menu_bar,COLOR_PAIR(3));
 }
 
-bool turn_button(unsigned char key, Data *data)
+void switch_draw(bool turn, unsigned char key)
 {
-    bool auxiliary;
     wmove(menu_bar,FIRST_LINE_MENU,key*BUTTON_SIZE+6);
-    if (key == 6) 
-    {
-        data->alarm[0] = !data->alarm[0];
-        auxiliary = data->alarm;
-    }
-    else
-    {
-        data->lamp ^= (1<<key);
-        auxiliary = data->lamp & (1<<key);
-    }
-    
-    if (auxiliary)
+    if (turn)
     {
         wattron(menu_bar,COLOR_PAIR(3));
-        waddstr(menu_bar, key_function[key+2]);
+        waddstr(menu_bar, key_function[key]);
         wattroff(menu_bar,COLOR_PAIR(3));
     }
     else
     {
         wattron(menu_bar,COLOR_PAIR(4));
-        waddstr(menu_bar, key_function[key+2]);
+        waddstr(menu_bar, key_function[key]);
         wattroff(menu_bar,COLOR_PAIR(4));
     }
+}
+
+bool switch_button(unsigned char key, Data *data)
+{
+    bool auxiliary;
+    
+    data->lamp ^= (1<<key);
+    auxiliary = data->lamp & (1<<key);
+    
+    switch_draw(auxiliary, key);
+
     return auxiliary;
+}
+
+bool switch_alarm (unsigned char key, Data *data, char *buffer)
+{
+    if (data->alarm)
+    {
+        bool auxiliary = false;
+
+        for (int i; i < NOPEN_SENSOR; i++)
+            if (!(data->open_sensor&1<<i))
+                auxiliary = true;
+        
+        for (int i; i < NPRESENCE_SENSOR; i++)
+            if (!(data->presence_sensor&1<<i))
+                auxiliary = true;
+
+        if (auxiliary)
+        {
+            sprintf(buffer, "close doors and windows before activating the alarm!");
+            return false;
+        }  
+    }
+
+    data->alarm = !data->alarm;
+
+    switch_draw(data->alarm, key);
+
+    sprintf(buffer, "alarm %s", message[data->alarm ? 1 : 0]);
+
+    return data->alarm;
 }
 
 /*!
@@ -144,11 +167,9 @@ void print_commands(int line)
     move(++line,4);
     printw("F5: turn on or off bedroom 2 lamp");
     move(++line,4);
-    printw("F6: set bedroom 1 temperature or Del to turn off");
+    printw("F6: set AC temperature or press Del to turn off");
     move(++line,4);
-    printw("F7: set bedroom 2 temperature or Del to turn off");
-    move(++line,4);
-    printw("F8: turn on or off alarm");
+    printw("F7: turn on or off alarm");
     move(++line,5);
     printw("^: up");
     move(++line,5);
@@ -288,7 +309,7 @@ void initialize_window ()
 void *input_values (void *args)
 {
     Data *data = (Data *) args;
-    WINDOW **air_1, **air_2;
+    WINDOW **air;
     int key;
     bool auxiliary;
     while (1)
@@ -296,55 +317,61 @@ void *input_values (void *args)
         key = getch();
         werase(windows.message);
         wrefresh(windows.message);
+        char buffer[30];
         switch (key)
         {
         case KEY_F(2):
-            auxiliary = turn_button(0, data);
-            wprintw(windows.message,"kitchen lamp %s", message[auxiliary ? 1 : 0]);
+            auxiliary = switch_button(0, data);
+            sprintf(buffer, "kitchen lamp %s", message[auxiliary ? 1 : 0]);
+            wprintw(windows.message, buffer);
             touchwin(stdscr);
             refresh();
+            store_data(buffer);
             break;
         case KEY_F(3):
-            auxiliary = turn_button(1, data);
-            wprintw(windows.message,"room lamp %s", message[auxiliary ? 1 : 0]);
+            auxiliary = switch_button(1, data);
+            sprintf(buffer, "room lamp %s", message[auxiliary ? 1 : 0]);
+            wprintw(windows.message, buffer);
             touchwin(stdscr);
             refresh();
+            store_data(buffer);
             break;
         case KEY_F(4):
-            auxiliary = turn_button(2, data);
-            wprintw(windows.message,"bedroom 1 lamp %s", message[auxiliary ? 1 : 0]);
+            auxiliary = switch_button(2, data);
+            sprintf(buffer, "bedroom 1 lamp %s", message[auxiliary ? 1 : 0]);
+            wprintw(windows.message, buffer);
             touchwin(stdscr);
             refresh();
+            store_data(buffer);
             break;
         case KEY_F(5):
-            auxiliary = turn_button(3, data);
-            wprintw(windows.message,"bedroom 2 lamp %s", message[auxiliary ? 1 : 0]);
+            auxiliary = switch_button(3, data);
+            sprintf(buffer, "bedroom 2 lamp %s", message[auxiliary ? 1 : 0]);
+            wprintw(windows.message, buffer);
             touchwin(stdscr);
             refresh();
+            store_data(buffer);
             break;
         case KEY_F(6):
-            air_1 = create_items(NLAMP*BUTTON_SIZE, NTEMPERATURE_VALUES, TEMPERATURE_FIRST_VALUE);
-            data->air_reference_temperature[0] = scrollmenu(air_1, NTEMPERATURE_VALUES, FIRST_COLUMN_MENU, TEMPERATURE_FIRST_VALUE);
-            deletaritensmenu(air_1, NTEMPERATURE_VALUES);
-            wprintw(windows.message,"Updated Reference Temperature: %.2f oC",data->air_reference_temperature[0]);
+            air = create_items(NLAMP*BUTTON_SIZE, NTEMPERATURE_VALUES, TEMPERATURE_FIRST_VALUE);
+            data->air_reference_temperature = scrollmenu(air, NTEMPERATURE_VALUES, FIRST_COLUMN_MENU, TEMPERATURE_FIRST_VALUE);
+            deletaritensmenu(air, NTEMPERATURE_VALUES);
+            sprintf(buffer,"updated reference temperature: %.2f oC", data->air_reference_temperature);
+            wprintw(windows.message, buffer);
             touchwin(stdscr);
             refresh();
+            store_data(buffer);
             break;
         case KEY_F(7):
-            air_2 = create_items((NLAMP+1)*BUTTON_SIZE, NTEMPERATURE_VALUES, TEMPERATURE_FIRST_VALUE);
-            data->air_reference_temperature[1] = scrollmenu(air_2, NTEMPERATURE_VALUES, FIRST_COLUMN_MENU, TEMPERATURE_FIRST_VALUE);
-            deletaritensmenu(air_2, NTEMPERATURE_VALUES);
-            wprintw(windows.message,"Updated Reference Temperature: %.2f oC",data->air_reference_temperature[1]);
+            auxiliary = switch_alarm(5, data, buffer);
+            wprintw(windows.message, buffer);
             touchwin(stdscr);
             refresh();
-            break;
-        case KEY_F(8):
-            auxiliary = turn_button(6, data);
-            wprintw(windows.message,"alarm %s", message[auxiliary ? 1 : 0]);
-            touchwin(stdscr);
-            refresh();
+            store_data(buffer);
             break;
         case ESCAPE:
+            sprintf(buffer, "exit");
+            store_data(buffer);
             return NULL;
         }
     }
@@ -356,8 +383,6 @@ void *input_values (void *args)
 void *output_values (void *args)
 {
     Data *data = (Data *) args;
-    while (1)
-    {
     int line = 2;
     
     move(line,BUTTON_SIZE*6);
@@ -412,7 +437,6 @@ void *output_values (void *args)
     printw("Window: %s", message[2+(data->open_sensor&(1<<5) ? 1 : 0)]);
     sleep(1);
     refresh();
-    }
     return NULL;
 }
 
