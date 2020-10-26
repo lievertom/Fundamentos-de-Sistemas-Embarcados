@@ -21,11 +21,7 @@
 #define FIRST_LINE_COMMANDS     2
 #define FIRST_LINE_INSTRUCTIONS 15
 
-#define NLAMPS                  4
-#define NAIR                    2
 #define BUTTON_SIZE             12
-
-#define AIR_OFF                 0.0f
 
 /****************************************************************************/
 /*!                            Structs                                      */
@@ -34,13 +30,6 @@ typedef struct Windows
     WINDOW *menu_bar;
     WINDOW *message;
 } Windows;
-
-typedef struct Actuators
-{
-    unsigned char lamps[NLAMPS];
-    unsigned char alarm;
-    float air[NAIR];
-} Actuators;
 
 /****************************************************************************/
 /*!                         Functions                                       */
@@ -61,7 +50,7 @@ void initialize_window ();
  *  @return void
  *
  */
-void *output_values ();
+void *output_values (void *args);
 
 /*!
  *  @brief Thread function to user input 
@@ -71,7 +60,7 @@ void *output_values ();
  *  @return void
  *
  */
-void *input_values ();
+void *input_values (void *args);
 
 /*!
  *  @brief Thread function that ends the window

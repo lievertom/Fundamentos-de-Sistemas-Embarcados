@@ -5,7 +5,6 @@
 #include <signal.h>
 #include <stdio.h>
 
-#include "window.h"
 #include "thread.h"
 
 /****************************************************************************/
@@ -21,12 +20,8 @@ int main(int argc, char* argv[])
     signal(SIGKILL, sig_handler);
     signal(SIGSTOP, sig_handler);
     signal(SIGINT, sig_handler);
-
-    initialize_window();
     
     initialize_threads();
 
     sig_handler(SIGINT);
-
-    return 0;
 }
