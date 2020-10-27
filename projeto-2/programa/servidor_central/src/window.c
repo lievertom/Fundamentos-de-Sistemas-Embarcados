@@ -110,24 +110,18 @@ bool switch_button(unsigned char key, Data *data)
     return auxiliary;
 }
 
-bool switch_alarm (unsigned char key, Data *data, char *buffer)
+void switch_alarm (unsigned char key, Data *data, char *buffer)
 {
-    if (data->alarm)
+    if (data->alarm && alarm_control(data))
     {
-        if (alarm_control(data))
-        {
-            sprintf(buffer, "close doors and windows before activating the alarm!");
-            return false;
-        }  
+        sprintf(buffer, "close doors and windows before activating the alarm!");
+        return; 
     }
-
     data->alarm = !data->alarm;
 
     switch_draw(data->alarm, key);
 
     sprintf(buffer, "alarm %s", message[data->alarm ? 1 : 0]);
-
-    return data->alarm;
 }
 
 /*!
@@ -308,7 +302,7 @@ void *input_values (void *args)
         key = getch();
         werase(windows.message);
         wrefresh(windows.message);
-        char buffer[30];
+        char buffer[60];
         switch (key)
         {
         case KEY_F(2):
@@ -354,7 +348,7 @@ void *input_values (void *args)
             store_data(buffer);
             break;
         case KEY_F(7):
-            auxiliary = switch_alarm(5, data, buffer);
+            switch_alarm(5, data, buffer);
             wprintw(windows.message, buffer);
             touchwin(stdscr);
             refresh();

@@ -20,17 +20,15 @@
  */
 bool alarm_control(Data *data)
 {
-    bool auxiliary = false;
-
-    for (int i; i < NOPEN_SENSOR; i++)
+    for (int i = 0; i < NOPEN_SENSOR; i++)
         if (!(data->open_sensor&1<<i))
-            auxiliary = true;
-    
-    for (int i; i < NPRESENCE_SENSOR; i++)
-        if (!(data->presence_sensor&1<<i))
-            auxiliary = true;
+            return true;
 
-    return auxiliary;
+    for (int i = 0; i < NPRESENCE_SENSOR; i++)
+        if (!(data->presence_sensor&1<<i))
+            return true;
+
+    return false;
 }
 
 
@@ -38,7 +36,7 @@ void *play_alarm(void *args)
 {
     Data *data = (Data *) args;
 
-    // if(alarm_control(data))
+    if(alarm_control(data))
     {
         data->alarm = !data->alarm;
         if (!fork())
