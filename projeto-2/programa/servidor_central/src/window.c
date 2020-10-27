@@ -375,13 +375,20 @@ void *output_values (void *args)
 {
     Data *data = (Data *) args;
     int line = 2;
+
+    move(line,BUTTON_SIZE*5);
+    printw("Temperature: %.2f oC", data->temperature);
+    move(++line,BUTTON_SIZE*5);
+    printw("Humidity: %.2f", data->humidity);
+
+    line += 2;
     
     move(line,BUTTON_SIZE*5);
     printw("Room");
-    move(++line,BUTTON_SIZE*5+2);
-    printw("Temperature: %.2f oC", data->temperature[1]);
-    move(++line,BUTTON_SIZE*5+2);
-    printw("Humidity: %.2f", data->humidity[1]);
+    // move(++line,BUTTON_SIZE*5+2);
+    // printw("Temperature: %.2f oC", data->temperature[1]);
+    // move(++line,BUTTON_SIZE*5+2);
+    // printw("Humidity: %.2f", data->humidity[1]);
     move(++line,BUTTON_SIZE*5+2);
     printw("Presence Sensor: %s", message[4+(data->presence_sensor&1 ? 1 : 0)]);
     move(++line,BUTTON_SIZE*5+2);
@@ -392,10 +399,10 @@ void *output_values (void *args)
     line += 2;
     move(line,BUTTON_SIZE*5);
     printw("Kitchen");
-    move(++line,BUTTON_SIZE*5+2);
-    printw("Temperature: %.2f oC", data->temperature[0]);
-    move(++line,BUTTON_SIZE*5+2);
-    printw("Humidity: %.2f", data->humidity[0]);
+    // move(++line,BUTTON_SIZE*5+2);
+    // printw("Temperature: %.2f oC", data->temperature[0]);
+    // move(++line,BUTTON_SIZE*5+2);
+    // printw("Humidity: %.2f", data->humidity[0]);
     move(++line,BUTTON_SIZE*5+2);
     printw("Presence Sensor: %s", message[4+(data->presence_sensor&(1<<1) ? 1 : 0)]);
     move(++line,BUTTON_SIZE*5+2);
@@ -408,10 +415,10 @@ void *output_values (void *args)
     printw("Bedroom 1");
     move(++line,BUTTON_SIZE*5+2);
     printw("air conditioning: %s", message[(data->air_turn&1 ? 1 : 0)]);
-    move(++line,BUTTON_SIZE*5+2);
-    printw("Temperature: %.2f oC", data->temperature[2]);
-    move(++line,BUTTON_SIZE*5+2);
-    printw("Humidity: %.2f", data->humidity[2]);
+    // move(++line,BUTTON_SIZE*5+2);
+    // printw("Temperature: %.2f oC", data->temperature[2]);
+    // move(++line,BUTTON_SIZE*5+2);
+    // printw("Humidity: %.2f", data->humidity[2]);
     move(++line,BUTTON_SIZE*5+2);
     printw("Window: %s", message[2+(data->open_sensor&(1<<4) ? 1 : 0)]);
     
@@ -420,10 +427,10 @@ void *output_values (void *args)
     printw("Bedroom 2");
     move(++line,BUTTON_SIZE*5+2);
     printw("air conditioning: %s", message[(data->air_turn&(1<<1) ? 1 : 0)]);
-    move(++line,BUTTON_SIZE*5+2);
-    printw("Temperature: %.2f oC", data->temperature[3]);
-    move(++line,BUTTON_SIZE*5+2);
-    printw("Humidity: %.2f", data->humidity[3]);
+    // move(++line,BUTTON_SIZE*5+2);
+    // printw("Temperature: %.2f oC", data->temperature[3]);
+    // move(++line,BUTTON_SIZE*5+2);
+    // printw("Humidity: %.2f", data->humidity[3]);
     move(++line,BUTTON_SIZE*5+2);
     printw("Window: %s", message[2+(data->open_sensor&(1<<5) ? 1 : 0)]);
     sleep(1);

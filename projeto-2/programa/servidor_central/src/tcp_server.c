@@ -27,13 +27,10 @@ void *receive(void *args)
         recv(data->client_socket, &data_receive, sizeof(data_receive), 0);
         
         data->air_turn = data_receive.air_turn;
+        data->humidity = data_receive.humidity;
+        data->temperature = data_receive.temperature;
         data->open_sensor = data_receive.open_sensor;
         data->presence_sensor = data_receive.presence_sensor;
-        for (int i = 0; i < NSENSOR; i++)
-        {
-            data->humidity[i] = data_receive.humidity[i];
-            data->temperature[i] = data_receive.temperature[i];
-        }
     }
     
 }

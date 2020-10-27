@@ -39,20 +39,20 @@ typedef struct Data
     int client_socket;
 } Data;
 
-typedef struct Send
+typedef struct Receive
 {
     unsigned char lamp;
     float air_reference_temperature;
-} Send;
+} Receive;
 
-typedef struct Receive
+typedef struct Send
 {
     unsigned char air_turn;
     unsigned char open_sensor;
     unsigned char presence_sensor;
     float humidity;
     float temperature;
-} Receive;
+} Send;
 
 /****************************************************************************/
 /*!                         Functions                                       */
