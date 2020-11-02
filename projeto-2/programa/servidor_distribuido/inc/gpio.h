@@ -3,23 +3,42 @@
 
 /****************************************************************************/
 /*!                              Macros                                     */
-#define AC_1               RPI_V2_GPIO_P1_23 
-#define AC_2               RPI_V2_GPIO_P1_24
- 
-#define LAMP_1             RPI_V2_GPIO_P1_17 
-#define LAMP_2             RPI_V2_GPIO_P1_18 
-#define LAMP_3             RPI_V2_GPIO_P1_27 
-#define LAMP_4             RPI_V2_GPIO_P1_22
- 
-#define OPEN_SENSOR_1      RPI_V2_GPIO_P1_05 
-#define OPEN_SENSOR_2      RPI_V2_GPIO_P1_06 
-#define OPEN_SENSOR_3      RPI_V2_GPIO_P1_12 
-#define OPEN_SENSOR_4      RPI_V2_GPIO_P1_16 
-#define OPEN_SENSOR_5      RPI_V2_GPIO_P1_20 
-#define OPEN_SENSOR_6      RPI_V2_GPIO_P1_21 
 
-#define PRESENCE_SENSOR_1  RPI_V2_GPIO_P1_18 
-#define PRESENCE_SENSOR_2  RPI_V2_GPIO_P1_18
+#define AC_1               RPI_V2_GPIO_P1_16 
+#define AC_2               RPI_V2_GPIO_P1_18
+ 
+#define LAMP_1             RPI_V2_GPIO_P1_11 
+#define LAMP_2             RPI_V2_GPIO_P1_12 
+#define LAMP_3             RPI_V2_GPIO_P1_13 
+#define LAMP_4             RPI_V2_GPIO_P1_15
+ 
+#define OPEN_SENSOR_1      RPI_V2_GPIO_P1_29 
+#define OPEN_SENSOR_2      RPI_V2_GPIO_P1_31 
+#define OPEN_SENSOR_3      RPI_V2_GPIO_P1_32 
+#define OPEN_SENSOR_4      RPI_V2_GPIO_P1_36 
+#define OPEN_SENSOR_5      RPI_V2_GPIO_P1_38 
+#define OPEN_SENSOR_6      RPI_V2_GPIO_P1_40 
+
+#define PRESENCE_SENSOR_1  RPI_V2_GPIO_P1_22 
+#define PRESENCE_SENSOR_2  RPI_V2_GPIO_P1_37
+
+// #define AC_1               RPI_V2_GPIO_P1_23 
+// #define AC_2               RPI_V2_GPIO_P1_24
+ 
+// #define LAMP_1             RPI_V2_GPIO_P1_17 
+// #define LAMP_2             RPI_V2_GPIO_P1_18 
+// #define LAMP_3             RPI_V2_GPIO_P1_27 
+// #define LAMP_4             RPI_V2_GPIO_P1_22
+ 
+// #define OPEN_SENSOR_1      RPI_V2_GPIO_P1_05 
+// #define OPEN_SENSOR_2      RPI_V2_GPIO_P1_06 
+// #define OPEN_SENSOR_3      RPI_V2_GPIO_P1_12 
+// #define OPEN_SENSOR_4      RPI_V2_GPIO_P1_16 
+// #define OPEN_SENSOR_5      RPI_V2_GPIO_P1_20 
+// #define OPEN_SENSOR_6      RPI_V2_GPIO_P1_21 
+
+// #define PRESENCE_SENSOR_1  RPI_V2_GPIO_P1_25 
+// #define PRESENCE_SENSOR_2  RPI_V2_GPIO_P1_26
 
 #define ON                 0
 #define OFF                1
@@ -33,7 +52,7 @@
  * @return void
  *
  */
-void initialize_actuators();
+void initialize_gpio();
 
 /*!
  *  @brief Function to switch actuators on or off
@@ -47,7 +66,7 @@ void initialize_actuators();
  *  @return void
  *
  */
-void on_off_actuators(int fan, int resistance);
+void turn_on_off(int device, int turn);
 
 /*!
  *  @brief Thread function that controls the actuators
@@ -57,6 +76,27 @@ void on_off_actuators(int fan, int resistance);
  * @return void
  *
  */
-void *actuators_control (void *args);
+void *sensor_control (void *args);
+
+/*!
+ *  @brief Thread function that controls the actuators
+ *
+ * @param[in] args       : Pointer to access the data structure
+ *
+ * @return void
+ *
+ */
+void *lamp_control (void *args);
+
+
+/*!
+ *  @brief Thread function that controls the actuators
+ *
+ * @param[in] args       : Pointer to access the data structure
+ *
+ * @return void
+ *
+ */
+void *ac_control (void *args);
 
 #endif /* GPIO_H_ */

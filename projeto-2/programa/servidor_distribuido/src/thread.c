@@ -5,9 +5,10 @@
 #include <bcm2835.h>
 #include <unistd.h>
 
-#include "actuator.h"
-#include "sensor.h"
 #include "data.h"
+#include "gpio.h"
+#include "sensor.h"
+#include "tcp_client.h"
 
 /******************************************************************************/
 /*! @file thread.c
@@ -18,8 +19,12 @@
 /****************************************************************************/
 /*!                        Global Statements                                */
 
-pthread_t actuator_thread;
+pthread_t ac_thread;
+pthread_t lamp_thread;
+pthread_t send_thread;
+pthread_t alarm_thread;
 pthread_t sensor_thread;
+pthread_t receive_thread;
 
 int count = 0;
 
@@ -33,23 +38,20 @@ Data data;
  */
 void alarm_handler(int signum)
 {   
-    if ((data.reference_temperature || data.potentiometer) && (data.hysteresis))
+    count++;
+    pthread_join(alarm_thread, NULL);
+    pthread_create(&alarm_thread, NULL, sensor_control, (void *) &data);
+    
+    if (count == 5)
     {
-        count++;
-        pthread_join(actuator_thread, NULL);
+        pthread_join(ac_thread, NULL);
+        pthread_join(lamp_thread, NULL);
         pthread_join(sensor_thread, NULL);
 
-        if(pthread_create(&actuator_thread, NULL, actuators_control, (void *) &data))
-        {
-            printf("actuator_thread\n");
-            reset();
-        }
-        
-        if (count == 5)
-        {
-            pthread_create(&sensor_thread, NULL, update_data_sensor, (void *) &data);
-            count = 0;
-        }
+        pthread_create(&ac_thread, NULL, ac_control, (void *) &data);
+        pthread_create(&lamp_thread, NULL, lamp_control, (void *) &data);
+        pthread_create(&sensor_thread, NULL, update_data_sensor, (void *) &data);
+        count = 0;
     }
 }
 
@@ -59,8 +61,10 @@ void alarm_handler(int signum)
 void sig_handler (int signal)
 {
     alarm(0);
-    pthread_join(actuator_thread, NULL);
+    pthread_join(ac_thread, NULL);
+    pthread_join(lamp_thread, NULL);
     pthread_join(sensor_thread, NULL);
+    pthread_cancel(receive_thread);
     bcm2835_close();
     exit(0);
 }
@@ -70,7 +74,17 @@ void sig_handler (int signal)
  */
 void initialize_threads()
 {
-    data.temperature = 0.0f;
+    data.air_reference_temperature = 0.0f;
 
-    ualarm(500000, 500000);
+    initialize_tcp_client(&data);
+
+    pthread_create(&receive_thread, NULL, receive, (void *) &data);
+
+    ualarm(200000, 200000);
+}
+
+void push()
+{
+    pthread_join(send_thread, NULL);
+    pthread_create(&send_thread, NULL, submit, (void *) &data);
 }

@@ -14,6 +14,7 @@
 #define DATE_SIZE               11
 #define HOUR_SIZE               9
 
+#define NAC                     2
 #define NLAMP                   4
 #define NOPEN_SENSOR            6
 #define NPRESENCE_SENSOR        2

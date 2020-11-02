@@ -11,6 +11,7 @@
 #include <time.h>
 
 #include "bme280.h"
+#include "thread.h"
 #include "data.h"
 
 /******************************************************************************/
@@ -155,10 +156,18 @@ void *update_data_sensor(void *args)
     /* Delay while the sensor completes a measurement */
     user_delay_us(70, device.intf_ptr);
     bme280_get_sensor_data(BME280_ALL, &comp_data, &device);
-    if (comp_data.temperature > 0.0f)
+
+    if (comp_data.temperature > 0.0f && comp_data.temperature < 50.0f)
     {
         data->temperature = comp_data.temperature;
+    }
+
+    if (comp_data.humidity > 0.0f && comp_data.humidity < 100.0f)
+    {
         data->humidity = comp_data.humidity;
     }
+
+    push();
+    
     return NULL;
 }

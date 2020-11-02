@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
     signal(SIGSTOP, sig_handler);
     signal(SIGINT, sig_handler);
 
-    initialize_actuators();
+    initialize_gpio();
     initialize_sensor();
     
     initialize_threads();
