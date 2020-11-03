@@ -101,10 +101,15 @@ void initialize_tcp_server(Data *data)
     server_address.sin_port = htons(DISTRIBUTED_SERVER_PORT);
  
     int enable = 1;
-    if (setsockopt(data->server_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+    if (setsockopt(data->server_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable)) < 0)
     {
         printf("Error in setsockopt(SO_REUSEADDR)");
     }
+
+#ifdef SO_REUSEPORT
+    if (setsockopt(data->server_socket, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(enable)) < 0) 
+        perror("setsockopt(SO_REUSEPORT) failed");
+#endif
 
     if(bind(data->server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
     {
