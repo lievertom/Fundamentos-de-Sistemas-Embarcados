@@ -36,7 +36,6 @@ typedef struct Data
     float temperature;
     float air_reference_temperature;
     int server_socket;
-    int client_socket;
 } Data;
 
 typedef struct Send

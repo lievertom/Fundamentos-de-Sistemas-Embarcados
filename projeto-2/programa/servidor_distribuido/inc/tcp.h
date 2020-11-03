@@ -1,5 +1,5 @@
-#ifndef TCP_SERVER_H_
-#define TCP_SERVER_H_
+#ifndef TCP_H_
+#define TCP_H_
 
 /******************************************************************************/
 /*                       Header includes                                      */
@@ -9,7 +9,17 @@
 /****************************************************************************/
 /*!                              Macros                                     */
 
-#define SERVER_PORT (unsigned short)10027
+// Servidor Distribuído:
+// - IP: 192.168.0.52;
+// - Porta pessoal: 10123.
+
+// Servidor Central:
+// - IP: 192.168.0.53;
+// - Porta pessoal: 10023.
+
+#define CENTRAL_SERVER_PORT (unsigned short)10027
+#define DISTRIBUTED_SERVER_PORT (unsigned short)10127
+#define SERVER_IP "192.168.0.53"
 
 /****************************************************************************/
 /*!                         Functions                                       */
@@ -20,4 +30,4 @@ void *receive(void *args);
 
 void *submit(void *args);
 
-#endif /* TCP_SERVER_H_ */
+#endif /* TCP_H_ */

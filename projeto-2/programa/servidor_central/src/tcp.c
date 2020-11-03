@@ -9,10 +9,10 @@
 #include <unistd.h>
 
 /******************************************************************************/
-/*! @file tcp_server.c
+/*! @file tcp.c
  * @brief Interface for tcp server
  */
-#include "tcp_server.h"
+#include "tcp.h"
 
 /****************************************************************************/
 /*!                         Functions                                       */
@@ -21,29 +21,61 @@ void *receive(void *args)
 {
     Data *data = (Data *) args;
     Receive data_receive;
+    int client_socket;
+    struct sockaddr_in client_address;
+    unsigned int client_Length = sizeof(client_address);
 
-    while (1)
+    while(1)
     {
-        recv(data->client_socket, &data_receive, sizeof(data_receive), 0);
-        
-        data->air_turn = data_receive.air_turn;
-        data->humidity = data_receive.humidity;
-        data->temperature = data_receive.temperature;
-        data->open_sensor = data_receive.open_sensor;
-        data->presence_sensor = data_receive.presence_sensor;
-    }
-    
+        if((client_socket = accept(data->server_socket, (struct sockaddr *) &client_address, &client_Length)) < 0)
+        {
+            printf("Error in client socket\n");
+        }
+        else;
+        {
+            recv(client_socket, &data_receive, sizeof(data_receive), 0);
+            
+            data->air_turn = data_receive.air_turn;
+            data->humidity = data_receive.humidity;
+            data->temperature = data_receive.temperature;
+            data->open_sensor = data_receive.open_sensor;
+            data->presence_sensor = data_receive.presence_sensor;
+
+            close(client_socket);
+        }
+    }    
 }
 
 void *submit(void *args)
 {
+    struct sockaddr_in server_address;
+    int client_socket;
+
+    if ((client_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+    {
+        printf("Error in client socket\n");
+    }
+
+    memset(&server_address, 0, sizeof(server_address));
+    server_address.sin_family = AF_INET;
+    server_address.sin_addr.s_addr = inet_addr(SERVER_IP);
+    server_address.sin_port = htons(DISTRIBUTED_SERVER_PORT);
+
+    if(connect(client_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
+    {
+        printf("Error in connect\n");
+    }
+
     Data *data = (Data *) args;
     Send data_send;
 
     data_send.lamp = data->lamp;
     data_send.air_reference_temperature = data->air_reference_temperature;
 
-    send(data->client_socket, &data_send, sizeof(data_send), 0);
+    send(client_socket, &data_send, sizeof(data_send), 0);
+
+    close(client_socket);
+
     return NULL;
 }
 
@@ -53,7 +85,6 @@ void *submit(void *args)
 void initialize_tcp_server(Data *data)
 {
     struct sockaddr_in server_address;
-    struct sockaddr_in client_address;
 
     if ((data->server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
     {
@@ -64,29 +95,17 @@ void initialize_tcp_server(Data *data)
     memset(&server_address, 0, sizeof(server_address));
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = htonl(INADDR_ANY);
-    server_address.sin_port = htons(SERVER_PORT);
+    server_address.sin_port = htons(CENTRAL_SERVER_PORT);
  
     if(bind(data->server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
     {
         printf("Error in blind\n");
-        // exit(2);
+        exit(2);
     }
 
 	if(listen(data->server_socket, 10) < 0)
     {
 		printf("Falha no Listen\n");
         exit(3);
-    }
-
-    unsigned int client_Length = sizeof(client_address);
-
-    while(1)
-    {
-        if((data->client_socket = accept(data->server_socket, (struct sockaddr *) &client_address, &client_Length)) < 0)
-        {
-            printf("Error in client socket\n");
-            exit(4);
-        }
-        else break;
     }
 }

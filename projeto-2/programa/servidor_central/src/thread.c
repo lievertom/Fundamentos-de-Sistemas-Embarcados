@@ -8,7 +8,7 @@
 #include "data.h"
 #include "alarm.h"
 #include "window.h"
-#include "tcp_server.h"
+#include "tcp.h"
 
 /******************************************************************************/
 /*! @file thread.c
@@ -62,7 +62,6 @@ void sig_handler (int signal)
     pthread_cancel(receive_thread);
     pthread_join(output_thread, NULL);
     end_window();
-    close(data.client_socket);    
     close(data.server_socket);
     printf("exit, log saved to dat/data.csv\n");
     exit(0);
@@ -73,14 +72,11 @@ void sig_handler (int signal)
  */
 void initialize_threads()
 {
-    data.alarm = 0;
     data.lamp = 0;
+    data.alarm = 0;
     data.air_turn = 0;
     data.open_sensor = 0;
     data.presence_sensor = 0;
-    data.client_socket = 0;
-
-    printf("waiting connection ...\n");
 
     initialize_tcp_server(&data);
     initialize_window();

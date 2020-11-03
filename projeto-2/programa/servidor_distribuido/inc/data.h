@@ -8,10 +8,6 @@
 
 /****************************************************************************/
 /*!                              Macros                                     */
-
-#define PATH_DATA               "dat/data.csv"
-
-#define DATE_SIZE               11
 #define HOUR_SIZE               9
 
 #define NAC                     2
@@ -37,7 +33,6 @@ typedef struct Data
     float temperature;
     float air_reference_temperature;
     int server_socket;
-    int client_socket;
 } Data;
 
 typedef struct Receive
@@ -54,18 +49,5 @@ typedef struct Send
     float humidity;
     float temperature;
 } Send;
-
-/****************************************************************************/
-/*!                         Functions                                       */
-
-/*!
- *  @brief Thread function that saves data
- *
- * @param[in] args       : Pointer to access the data structure
- *
- *  @return void
- *
- */
-void *save_data (void *args);
 
 #endif /* DATA_H_ */

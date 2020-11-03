@@ -8,7 +8,7 @@
 #include "data.h"
 #include "gpio.h"
 #include "sensor.h"
-#include "tcp_client.h"
+#include "tcp.h"
 
 /******************************************************************************/
 /*! @file thread.c
@@ -65,7 +65,7 @@ void sig_handler (int signal)
     pthread_join(lamp_thread, NULL);
     pthread_join(sensor_thread, NULL);
     pthread_cancel(receive_thread);
-    close(data.client_socket);    
+    close(data.server_socket);    
     bcm2835_close();
     exit(0);
 }
@@ -75,13 +75,11 @@ void sig_handler (int signal)
  */
 void initialize_threads()
 {
-    initialize_tcp_client(&data);
+    initialize_tcp_server(&data);
 
-    ualarm(200000, 200000);
-    
     pthread_create(&receive_thread, NULL, receive, (void *) &data);
-    pthread_join(receive_thread, NULL);
-
+    
+    ualarm(200000, 200000);
 }
 
 void push()
