@@ -95,11 +95,6 @@ void initialize_tcp_server(Data *data)
         exit(1);
     }
 
-    memset(&server_address, 0, sizeof(server_address));
-    server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = htonl(INADDR_ANY);
-    server_address.sin_port = htons(DISTRIBUTED_SERVER_PORT);
- 
     int enable = 1;
     if (setsockopt(data->server_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable)) < 0)
     {
@@ -110,6 +105,11 @@ void initialize_tcp_server(Data *data)
     if (setsockopt(data->server_socket, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(enable)) < 0) 
         perror("setsockopt(SO_REUSEPORT) failed");
 #endif
+
+    memset(&server_address, 0, sizeof(server_address));
+    server_address.sin_family = AF_INET;
+    server_address.sin_addr.s_addr = htonl(INADDR_ANY);
+    server_address.sin_port = htons(DISTRIBUTED_SERVER_PORT);
 
     if(bind(data->server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
     {
