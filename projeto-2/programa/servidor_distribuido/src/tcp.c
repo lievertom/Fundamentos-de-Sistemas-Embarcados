@@ -100,6 +100,12 @@ void initialize_tcp_server(Data *data)
     server_address.sin_addr.s_addr = htonl(INADDR_ANY);
     server_address.sin_port = htons(DISTRIBUTED_SERVER_PORT);
  
+    int enable = 1;
+    if (setsockopt(data->server_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+    {
+        printf("Error in setsockopt(SO_REUSEADDR)");
+    }
+
     if(bind(data->server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
     {
         printf("Error in blind\n");
