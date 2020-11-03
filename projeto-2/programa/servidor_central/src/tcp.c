@@ -31,7 +31,7 @@ void *receive(void *args)
         {
             printf("Error in client socket\n");
         }
-        else;
+        else
         {
             recv(client_socket, &data_receive, sizeof(data_receive), 0);
             
