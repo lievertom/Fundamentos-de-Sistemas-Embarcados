@@ -35,4 +35,6 @@ void alarm_handler(int signum);
  */
 void initialize_threads();
 
+void push();
+
 #endif /* THREAD_H_ */

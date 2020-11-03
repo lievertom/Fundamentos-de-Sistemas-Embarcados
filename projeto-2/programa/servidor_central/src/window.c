@@ -23,7 +23,8 @@
 Windows windows;
 WINDOW *menu_bar;
 
-const char *key_function[] = {
+const char *key_function[] =
+{
     " F2 ",
     " F3 ",
     " F4 ",
@@ -312,6 +313,7 @@ void *input_values (void *args)
             touchwin(stdscr);
             refresh();
             store_data(buffer);
+            push(); 
             break;
         case KEY_F(3):
             auxiliary = switch_button(1, data);
@@ -320,6 +322,7 @@ void *input_values (void *args)
             touchwin(stdscr);
             refresh();
             store_data(buffer);
+            push(); 
             break;
         case KEY_F(4):
             auxiliary = switch_button(2, data);
@@ -328,6 +331,7 @@ void *input_values (void *args)
             touchwin(stdscr);
             refresh();
             store_data(buffer);
+            push(); 
             break;
         case KEY_F(5):
             auxiliary = switch_button(3, data);
@@ -336,6 +340,7 @@ void *input_values (void *args)
             touchwin(stdscr);
             refresh();
             store_data(buffer);
+            push(); 
             break;
         case KEY_F(6):
             air = create_items(NLAMP*BUTTON_SIZE, NTEMPERATURE_VALUES, TEMPERATURE_FIRST_VALUE);
@@ -346,6 +351,7 @@ void *input_values (void *args)
             touchwin(stdscr);
             refresh();
             store_data(buffer);
+            push(); 
             break;
         case KEY_F(7):
             switch_alarm(5, data, buffer);
@@ -353,6 +359,7 @@ void *input_values (void *args)
             touchwin(stdscr);
             refresh();
             store_data(buffer);
+            push(); 
             break;
         case ESCAPE:
             sprintf(buffer, "exit");

@@ -1,9 +1,9 @@
 /******************************************************************************/
 /*                       Header includes                                      */
 
-#include <pthread.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #include "data.h"
 #include "alarm.h"
@@ -19,12 +19,12 @@
 /****************************************************************************/
 /*!                        Global Statements                                */
 
-pthread_t output_thread;
-pthread_t input_thread;
-pthread_t receive_thread;
-pthread_t send_thread;
 pthread_t log_thread;
+pthread_t send_thread;
+pthread_t input_thread;
 pthread_t alarm_thread;
+pthread_t output_thread;
+pthread_t receive_thread;
 
 Data data;
 
@@ -50,10 +50,7 @@ void alarm_handler(int signum)
     if (!data.alarm)
         pthread_create(&alarm_thread, NULL, play_alarm, (void *) &data);        
 
-    // pthread_join(send_thread, NULL);
-
     pthread_create(&output_thread, NULL, output_values, (void *) &data);        
-    // pthread_create(&send_thread, NULL, submit, (void *) &data);        
 }
 
 /*!
@@ -62,8 +59,7 @@ void alarm_handler(int signum)
 void sig_handler (int signal)
 {
     alarm(0);
-    // pthread_cancel(receive_thread);
-    // pthread_join(send_thread, NULL);
+    pthread_cancel(receive_thread);
     pthread_join(output_thread, NULL);
     end_window();
     close(data.client_socket);    
@@ -86,7 +82,7 @@ void initialize_threads()
 
     printf("waiting connection ...\n");
 
-    // initialize_tcp_server(&data);
+    initialize_tcp_server(&data);
     initialize_window();
     
     if (pthread_create(&input_thread, NULL, input_values, (void *) &data))
@@ -95,13 +91,19 @@ void initialize_threads()
         exit(1);
     }
 
-    // if(pthread_create(&receive_thread, NULL, receive, (void *) &data))
-    // {
-    //     printf("Fail to create receive_thread\n");
-    //     exit(2);
-    // }
+    if(pthread_create(&receive_thread, NULL, receive, (void *) &data))
+    {
+        printf("Fail to create receive_thread\n");
+        exit(2);
+    }
 
     alarm(1);
 
     pthread_join(input_thread, NULL);
+}
+
+void push()
+{
+    pthread_join(send_thread, NULL);
+    pthread_create(&send_thread, NULL, submit, (void *) &data);
 }
