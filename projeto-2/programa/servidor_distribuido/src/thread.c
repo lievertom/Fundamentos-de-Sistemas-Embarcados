@@ -78,8 +78,10 @@ void initialize_threads()
     initialize_tcp_server(&data);
 
     pthread_create(&receive_thread, NULL, receive, (void *) &data);
-    
+
     ualarm(200000, 200000);
+    
+    pthread_join(receive_thread, NULL);
 }
 
 void push()

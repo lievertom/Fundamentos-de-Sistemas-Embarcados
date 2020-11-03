@@ -24,7 +24,6 @@
 
 typedef struct Data 
 {
-    bool alarm;
     unsigned char lamp;
     unsigned char air_turn;
     unsigned char open_sensor;

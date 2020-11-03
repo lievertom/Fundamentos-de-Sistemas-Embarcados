@@ -39,16 +39,16 @@ void *play_alarm(void *args)
     if(alarm_control(data))
     {
         data->alarm = !data->alarm;
-        if (!fork())
-        {
-            char *arguments[] = {
-                COMMAND,
-                PATH_AUDIO,
-                NULL
-            };
+        // if (!fork())
+        // {
+        //     char *arguments[] = {
+        //         COMMAND,
+        //         PATH_AUDIO,
+        //         NULL
+        //     };
 
-            execvp(COMMAND, arguments);
-        }
+        //     execvp(COMMAND, arguments);
+        // }
     }
 
     return NULL;
