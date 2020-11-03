@@ -21,11 +21,11 @@
 bool alarm_control(Data *data)
 {
     for (int i = 0; i < NOPEN_SENSOR; i++)
-        if (!(data->open_sensor&1<<i))
+        if (data->open_sensor&1<<i)
             return true;
 
     for (int i = 0; i < NPRESENCE_SENSOR; i++)
-        if (!(data->presence_sensor&1<<i))
+        if (data->presence_sensor&1<<i)
             return true;
 
     return false;

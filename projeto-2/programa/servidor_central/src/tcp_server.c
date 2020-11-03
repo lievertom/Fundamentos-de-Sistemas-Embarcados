@@ -65,11 +65,11 @@ void initialize_tcp_server(Data *data)
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = htonl(INADDR_ANY);
     server_address.sin_port = htons(SERVER_PORT);
-
+ 
     if(bind(data->server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
     {
         printf("Error in blind\n");
-        exit(2);
+        // exit(2);
     }
 
 	if(listen(data->server_socket, 10) < 0)

@@ -10,7 +10,7 @@
 /*!                              Macros                                     */
 
 #define SERVER_PORT (unsigned short)10027
-#define SERVER_IP "192.168.0.53"
+#define SERVER_IP "192.168.0.52"
 
 /****************************************************************************/
 /*!                         Functions                                       */

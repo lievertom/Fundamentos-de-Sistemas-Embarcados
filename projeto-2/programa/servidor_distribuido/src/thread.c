@@ -65,6 +65,7 @@ void sig_handler (int signal)
     pthread_join(lamp_thread, NULL);
     pthread_join(sensor_thread, NULL);
     pthread_cancel(receive_thread);
+    close(data.client_socket);    
     bcm2835_close();
     exit(0);
 }
@@ -74,13 +75,13 @@ void sig_handler (int signal)
  */
 void initialize_threads()
 {
-    data.air_reference_temperature = 0.0f;
-
     initialize_tcp_client(&data);
 
-    pthread_create(&receive_thread, NULL, receive, (void *) &data);
-
     ualarm(200000, 200000);
+    
+    pthread_create(&receive_thread, NULL, receive, (void *) &data);
+    pthread_join(receive_thread, NULL);
+
 }
 
 void push()

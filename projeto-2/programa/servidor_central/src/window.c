@@ -87,15 +87,15 @@ void switch_draw(bool turn, unsigned char key)
     wmove(menu_bar,FIRST_LINE_MENU,key*BUTTON_SIZE+6);
     if (turn)
     {
-        wattron(menu_bar,COLOR_PAIR(3));
-        waddstr(menu_bar, key_function[key]);
-        wattroff(menu_bar,COLOR_PAIR(3));
-    }
-    else
-    {
         wattron(menu_bar,COLOR_PAIR(4));
         waddstr(menu_bar, key_function[key]);
         wattroff(menu_bar,COLOR_PAIR(4));
+    }
+    else
+    {
+        wattron(menu_bar,COLOR_PAIR(3));
+        waddstr(menu_bar, key_function[key]);
+        wattroff(menu_bar,COLOR_PAIR(3));
     }
 }
 
@@ -113,7 +113,7 @@ bool switch_button(unsigned char key, Data *data)
 
 void switch_alarm (unsigned char key, Data *data, char *buffer)
 {
-    if (data->alarm && alarm_control(data))
+    if (!data->alarm && alarm_control(data))
     {
         sprintf(buffer, "close doors and windows before activating the alarm!");
         return; 
@@ -122,7 +122,7 @@ void switch_alarm (unsigned char key, Data *data, char *buffer)
 
     switch_draw(data->alarm, key);
 
-    sprintf(buffer, "alarm %s", message[data->alarm ? 1 : 0]);
+    sprintf(buffer, "alarm %s", message[data->alarm ? 0 : 1]);
 }
 
 /*!
@@ -235,7 +235,8 @@ float scrollmenu(WINDOW **menu_items, int number_items, int column, int first_va
             if (key==KEY_DOWN)
             {
                 selected=(selected+1) % number_items;
-            } else
+            } 
+            else
             {
                 selected=(selected+number_items-1) % number_items;
             }
@@ -308,7 +309,7 @@ void *input_values (void *args)
         {
         case KEY_F(2):
             auxiliary = switch_button(0, data);
-            sprintf(buffer, "kitchen lamp %s", message[auxiliary ? 1 : 0]);
+            sprintf(buffer, "kitchen lamp %s", message[auxiliary ? 0 : 1]);
             wprintw(windows.message, buffer);
             touchwin(stdscr);
             refresh();
@@ -317,7 +318,7 @@ void *input_values (void *args)
             break;
         case KEY_F(3):
             auxiliary = switch_button(1, data);
-            sprintf(buffer, "room lamp %s", message[auxiliary ? 1 : 0]);
+            sprintf(buffer, "room lamp %s", message[auxiliary ? 0 : 1]);
             wprintw(windows.message, buffer);
             touchwin(stdscr);
             refresh();
@@ -326,7 +327,7 @@ void *input_values (void *args)
             break;
         case KEY_F(4):
             auxiliary = switch_button(2, data);
-            sprintf(buffer, "bedroom 1 lamp %s", message[auxiliary ? 1 : 0]);
+            sprintf(buffer, "bedroom 1 lamp %s", message[auxiliary ? 0 : 1]);
             wprintw(windows.message, buffer);
             touchwin(stdscr);
             refresh();
@@ -335,7 +336,7 @@ void *input_values (void *args)
             break;
         case KEY_F(5):
             auxiliary = switch_button(3, data);
-            sprintf(buffer, "bedroom 2 lamp %s", message[auxiliary ? 1 : 0]);
+            sprintf(buffer, "bedroom 2 lamp %s", message[auxiliary ? 0 : 1]);
             wprintw(windows.message, buffer);
             touchwin(stdscr);
             refresh();
@@ -346,7 +347,10 @@ void *input_values (void *args)
             air = create_items(NLAMP*BUTTON_SIZE, NTEMPERATURE_VALUES, TEMPERATURE_FIRST_VALUE);
             data->air_reference_temperature = scrollmenu(air, NTEMPERATURE_VALUES, FIRST_COLUMN_MENU, TEMPERATURE_FIRST_VALUE);
             deletaritensmenu(air, NTEMPERATURE_VALUES);
-            sprintf(buffer,"updated reference temperature: %.2f oC", data->air_reference_temperature);
+            if (data->air_reference_temperature > 0.0f)
+                sprintf(buffer,"updated reference temperature: %.2f oC", data->air_reference_temperature);
+            else
+                sprintf(buffer,"reference temperature disabled");
             wprintw(windows.message, buffer);
             touchwin(stdscr);
             refresh();
@@ -378,63 +382,51 @@ void *output_values (void *args)
     int line = 2;
 
     move(line,BUTTON_SIZE*5);
-    printw("Temperature: %.2f oC", data->temperature);
+    if (data->air_reference_temperature > 0.0f)
+        printw("Reference Temperature: %.2f   ", data->air_reference_temperature);
+    else
+        printw("Reference Temperature: desabled   ");
     move(++line,BUTTON_SIZE*5);
-    printw("Humidity: %.2f", data->humidity);
+    printw("Temperature: %.2f oC  ", data->temperature);
+    move(++line,BUTTON_SIZE*5);
+    printw("Humidity: %.2f  ", data->humidity);
 
     line += 2;
     
     move(line,BUTTON_SIZE*5);
     printw("Room");
-    // move(++line,BUTTON_SIZE*5+2);
-    // printw("Temperature: %.2f oC", data->temperature[1]);
-    // move(++line,BUTTON_SIZE*5+2);
-    // printw("Humidity: %.2f", data->humidity[1]);
     move(++line,BUTTON_SIZE*5+2);
-    printw("Presence Sensor: %s", message[4+(data->presence_sensor&1 ? 1 : 0)]);
+    printw("Presence Sensor: %s  ", message[4+(data->presence_sensor&1 ? 0 : 1)]);
     move(++line,BUTTON_SIZE*5+2);
-    printw("Window: %s", message[2+(data->open_sensor&(1<<3) ? 1 : 0)]);
+    printw("Window: %s  ", message[2+(data->open_sensor&(1<<3) ? 0 : 1)]);
     move(++line,BUTTON_SIZE*5+2);
-    printw("Door: %s", message[2+(data->open_sensor&(1<<2) ? 1 : 0)]);
+    printw("Door: %s  ", message[2+(data->open_sensor&(1<<2) ? 0 : 1)]);
     
     line += 2;
     move(line,BUTTON_SIZE*5);
     printw("Kitchen");
-    // move(++line,BUTTON_SIZE*5+2);
-    // printw("Temperature: %.2f oC", data->temperature[0]);
-    // move(++line,BUTTON_SIZE*5+2);
-    // printw("Humidity: %.2f", data->humidity[0]);
     move(++line,BUTTON_SIZE*5+2);
-    printw("Presence Sensor: %s", message[4+(data->presence_sensor&(1<<1) ? 1 : 0)]);
+    printw("Presence Sensor: %s  ", message[4+(data->presence_sensor&(1<<1) ? 0 : 1)]);
     move(++line,BUTTON_SIZE*5+2);
-    printw("Window: %s", message[2+(data->open_sensor&(1<<1) ? 1 : 0)]);
+    printw("Window: %s  ", message[2+(data->open_sensor&(1<<1) ? 0 : 1)]);
     move(++line,BUTTON_SIZE*5+2);
-    printw("Door: %s", message[2+(data->open_sensor&1 ? 1 : 0)]);
+    printw("Door: %s  ", message[2+(data->open_sensor&1 ? 0 : 1)]);
     
     line += 2;
     move(line,BUTTON_SIZE*5);
     printw("Bedroom 1");
     move(++line,BUTTON_SIZE*5+2);
-    printw("air conditioning: %s", message[(data->air_turn&1 ? 1 : 0)]);
-    // move(++line,BUTTON_SIZE*5+2);
-    // printw("Temperature: %.2f oC", data->temperature[2]);
-    // move(++line,BUTTON_SIZE*5+2);
-    // printw("Humidity: %.2f", data->humidity[2]);
+    printw("air conditioning: %s  ", message[(data->air_turn&1 ? 0 : 1)]);
     move(++line,BUTTON_SIZE*5+2);
-    printw("Window: %s", message[2+(data->open_sensor&(1<<4) ? 1 : 0)]);
+    printw("Window: %s  ", message[2+(data->open_sensor&(1<<4) ? 0 : 1)]);
     
     line += 2;
     move(line,BUTTON_SIZE*5);
     printw("Bedroom 2");
     move(++line,BUTTON_SIZE*5+2);
-    printw("air conditioning: %s", message[(data->air_turn&(1<<1) ? 1 : 0)]);
-    // move(++line,BUTTON_SIZE*5+2);
-    // printw("Temperature: %.2f oC", data->temperature[3]);
-    // move(++line,BUTTON_SIZE*5+2);
-    // printw("Humidity: %.2f", data->humidity[3]);
+    printw("air conditioning: %s  ", message[(data->air_turn&(1<<1) ? 0 : 1)]);
     move(++line,BUTTON_SIZE*5+2);
-    printw("Window: %s", message[2+(data->open_sensor&(1<<5) ? 1 : 0)]);
-    sleep(1);
+    printw("Window: %s  ", message[2+(data->open_sensor&(1<<5) ? 0 : 1)]);
     refresh();
     return NULL;
 }

@@ -54,6 +54,7 @@ void initialize_gpio()
 
     if (!bcm2835_init())
     {
+        printf("Error in bcm2835_init");
         exit(1);
     }
     configuration();
@@ -73,22 +74,19 @@ void turn_on_of (int device, int turn)
 void *ac_control (void *args)
 {
     Data *data = (Data *) args;
-    if (data->air_reference_temperature > 0.0f)
+    if (data->air_reference_temperature > 0.0f && data->air_reference_temperature <= data->temperature)
     {
-        if (data->air_reference_temperature <= data->temperature)
-        {
-            turn_on_of(AC_1, ON);
-            turn_on_of(AC_2, ON);
-            for(int i = 0; i < NAC; i++)
-                data->air_turn |= 1<<i;
-        }
-        else
-        {
-            turn_on_of(AC_1, OFF);
-            turn_on_of(AC_2, OFF);
-            for(int i = 0; i < NAC; i++)
-                data->air_turn &= 0<<i;
-        }
+        turn_on_of(AC_1, ON);
+        turn_on_of(AC_2, ON);
+        for(int i = 0; i < NAC; i++)
+            data->air_turn |= 1<<i;
+    }
+    else
+    {
+        turn_on_of(AC_1, OFF);
+        turn_on_of(AC_2, OFF);
+        for(int i = 0; i < NAC; i++)
+            data->air_turn &= 0<<i;
     }
     return NULL;
 }
@@ -110,17 +108,17 @@ void *sensor_control (void *args)
 
     data_send.open_sensor = 0;
 
-    data_send.open_sensor |= OPEN_SENSOR_1<<0;
-    data_send.open_sensor |= OPEN_SENSOR_2<<1;
-    data_send.open_sensor |= OPEN_SENSOR_3<<2;
-    data_send.open_sensor |= OPEN_SENSOR_4<<3;
-    data_send.open_sensor |= OPEN_SENSOR_5<<4;
-    data_send.open_sensor |= OPEN_SENSOR_6<<5;
+    data_send.open_sensor |= bcm2835_gpio_lev(OPEN_SENSOR_1)<<0;
+    data_send.open_sensor |= bcm2835_gpio_lev(OPEN_SENSOR_2)<<1;
+    data_send.open_sensor |= bcm2835_gpio_lev(OPEN_SENSOR_3)<<2;
+    data_send.open_sensor |= bcm2835_gpio_lev(OPEN_SENSOR_4)<<3;
+    data_send.open_sensor |= bcm2835_gpio_lev(OPEN_SENSOR_5)<<4;
+    data_send.open_sensor |= bcm2835_gpio_lev(OPEN_SENSOR_6)<<5;
 
     data_send.presence_sensor = 0;
 
-    data_send.presence_sensor |= PRESENCE_SENSOR_1<<0;
-    data_send.presence_sensor |= PRESENCE_SENSOR_2<<1;
+    data_send.presence_sensor |= bcm2835_gpio_lev(PRESENCE_SENSOR_1)<<0;
+    data_send.presence_sensor |= bcm2835_gpio_lev(PRESENCE_SENSOR_2)<<1;
 
     if (data_send.open_sensor != data->open_sensor ||
             data_send.presence_sensor != data->presence_sensor)

@@ -73,11 +73,11 @@ void sig_handler (int signal)
  */
 void initialize_threads()
 {
-    data.alarm = 1;
-    data.lamp = 255;
-    data.air_turn = 255;
-    data.open_sensor = 255;
-    data.presence_sensor = 255;
+    data.alarm = 0;
+    data.lamp = 0;
+    data.air_turn = 0;
+    data.open_sensor = 0;
+    data.presence_sensor = 0;
     data.client_socket = 0;
 
     printf("waiting connection ...\n");

@@ -112,7 +112,7 @@ void initialize_sensor()
 
     if ((id.file_descriptor = open(BUS, O_RDWR)) < 0)
     {
-        fprintf(stderr, "Failed to open the i2c bus %s\n", BUS);
+        printf("Failed to open the i2c bus %s\n", BUS);
         exit(1);
     }
 
@@ -120,7 +120,7 @@ void initialize_sensor()
 
     if (ioctl(id.file_descriptor, I2C_SLAVE, id.device_address) < 0)
     {
-        fprintf(stderr, "Failed to acquire bus access and/or talk to slave.\n");
+        printf("Failed to acquire bus access and/or talk to slave.\n");
         exit(1);
     }
 
@@ -138,13 +138,13 @@ void initialize_sensor()
     result = bme280_init(&device);
     if (result != BME280_OK)
     {
-        fprintf(stderr, "Failed to initialize the device (code %+d).\n", result);
+        printf("Failed to initialize the device (code %+d).\n", result);
         exit(1);
     }
     result = stream_sensor_data_normal_mode();
     if (result != BME280_OK)
     {
-        fprintf(stderr, "Failed to stream sensor data (code %+d).\n", result);
+        printf("Failed to stream sensor data (code %+d).\n", result);
         exit(1);
     }
 }
