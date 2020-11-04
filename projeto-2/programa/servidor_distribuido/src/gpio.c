@@ -63,7 +63,7 @@ void initialize_gpio()
 /*!
  * @brief This function turn on or off.
  */
-void turn_on_of (int device, int turn)
+void turn_on_off(int device, int turn)
 {
     bcm2835_gpio_write(device, turn);
 }
@@ -76,15 +76,15 @@ void *ac_control (void *args)
     Data *data = (Data *) args;
     if (data->air_reference_temperature > 0.0f && data->air_reference_temperature <= data->temperature)
     {
-        turn_on_of(AC_1, ON);
-        turn_on_of(AC_2, ON);
+        turn_on_off(AC_1, ON);
+        turn_on_off(AC_2, ON);
         for(int i = 0; i < NAC; i++)
             data->air_turn |= 1<<i;
     }
     else
     {
-        turn_on_of(AC_1, OFF);
-        turn_on_of(AC_2, OFF);
+        turn_on_off(AC_1, OFF);
+        turn_on_off(AC_2, OFF);
         for(int i = 0; i < NAC; i++)
             data->air_turn &= 0<<i;
     }
@@ -94,10 +94,10 @@ void *ac_control (void *args)
 void *lamp_control (void *args)
 {
     Data *data = (Data *) args;
-    turn_on_of(LAMP_1, data->lamp & 1<<0);
-    turn_on_of(LAMP_2, data->lamp & 1<<1);
-    turn_on_of(LAMP_3, data->lamp & 1<<2);
-    turn_on_of(LAMP_4, data->lamp & 1<<3);
+    turn_on_off(LAMP_1, data->lamp & 1<<0);
+    turn_on_off(LAMP_2, data->lamp & 1<<1);
+    turn_on_off(LAMP_3, data->lamp & 1<<2);
+    turn_on_off(LAMP_4, data->lamp & 1<<3);
     return NULL;
 }
 

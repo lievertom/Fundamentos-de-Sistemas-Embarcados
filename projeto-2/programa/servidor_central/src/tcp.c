@@ -1,13 +1,13 @@
 /******************************************************************************/
 /*                       Header includes                                      */
 
-#include <stdio.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
+#include <stdio.h>
 
 /******************************************************************************/
 /*! @file tcp.c
@@ -62,10 +62,7 @@ void *submit(void *args)
     server_address.sin_addr.s_addr = inet_addr(DISTRIBUTED_SERVER_IP);
     server_address.sin_port = htons(DISTRIBUTED_SERVER_PORT);
 
-    if(connect(client_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
-    {
-        printf("Error in connect\n");
-    }
+    while(connect(client_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0);
 
     Data *data = (Data *) args;
     Send data_send;

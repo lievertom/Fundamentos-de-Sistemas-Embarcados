@@ -116,13 +116,15 @@ void switch_alarm (unsigned char key, Data *data, char *buffer)
     if (!data->alarm && alarm_control(data))
     {
         sprintf(buffer, "close doors and windows before activating the alarm!");
-        return; 
     }
-    data->alarm = !data->alarm;
+    else
+    {
+        data->alarm = !(data->alarm);
 
-    switch_draw(data->alarm, key);
+        switch_draw(data->alarm, key);
 
-    sprintf(buffer, "alarm %s", message[data->alarm ? 0 : 1]);
+        sprintf(buffer, "alarm %s", message[data->alarm ? 0 : 1]);
+    }
 }
 
 /*!
@@ -308,7 +310,7 @@ void *input_values (void *args)
         switch (key)
         {
         case KEY_F(2):
-            auxiliary = switch_button(0, data);
+            auxiliary = switch_button((unsigned char)0, data);
             sprintf(buffer, "kitchen lamp %s", message[auxiliary ? 0 : 1]);
             wprintw(windows.message, buffer);
             touchwin(stdscr);
@@ -317,7 +319,7 @@ void *input_values (void *args)
             push(); 
             break;
         case KEY_F(3):
-            auxiliary = switch_button(1, data);
+            auxiliary = switch_button((unsigned char)1, data);
             sprintf(buffer, "room lamp %s", message[auxiliary ? 0 : 1]);
             wprintw(windows.message, buffer);
             touchwin(stdscr);
@@ -326,7 +328,7 @@ void *input_values (void *args)
             push(); 
             break;
         case KEY_F(4):
-            auxiliary = switch_button(2, data);
+            auxiliary = switch_button((unsigned char)2, data);
             sprintf(buffer, "bedroom 1 lamp %s", message[auxiliary ? 0 : 1]);
             wprintw(windows.message, buffer);
             touchwin(stdscr);
@@ -335,7 +337,7 @@ void *input_values (void *args)
             push(); 
             break;
         case KEY_F(5):
-            auxiliary = switch_button(3, data);
+            auxiliary = switch_button((unsigned char)3, data);
             sprintf(buffer, "bedroom 2 lamp %s", message[auxiliary ? 0 : 1]);
             wprintw(windows.message, buffer);
             touchwin(stdscr);
@@ -358,12 +360,11 @@ void *input_values (void *args)
             push(); 
             break;
         case KEY_F(7):
-            switch_alarm(5, data, buffer);
+            switch_alarm((unsigned char)5, data, buffer);
             wprintw(windows.message, buffer);
             touchwin(stdscr);
             refresh();
             store_data(buffer);
-            push(); 
             break;
         case ESCAPE:
             sprintf(buffer, "exit");
@@ -390,6 +391,8 @@ void *output_values (void *args)
     printw("Temperature: %.2f oC  ", data->temperature);
     move(++line,BUTTON_SIZE*5);
     printw("Humidity: %.2f  ", data->humidity);
+    move(++line,BUTTON_SIZE*5);
+    printw("alarm: %d  ", data->alarm);
 
     line += 2;
     

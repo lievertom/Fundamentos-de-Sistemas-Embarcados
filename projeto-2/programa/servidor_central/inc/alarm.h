@@ -25,7 +25,7 @@
  *  @return void
  *
  */
-bool alarm_control(Data *data);
+unsigned char alarm_control(Data *data);
 
 void *play_alarm(void *args);
 

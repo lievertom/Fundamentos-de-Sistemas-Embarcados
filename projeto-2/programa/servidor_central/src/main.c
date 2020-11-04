@@ -22,6 +22,5 @@ int main(int argc, char* argv[])
     signal(SIGINT, sig_handler);
     
     initialize_threads();
-
     sig_handler(SIGINT);
 }

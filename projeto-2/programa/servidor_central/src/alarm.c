@@ -18,17 +18,17 @@
 /*!
  * @brief Function to control the alarm.
  */
-bool alarm_control(Data *data)
+unsigned char alarm_control(Data *data)
 {
     for (int i = 0; i < NOPEN_SENSOR; i++)
         if (data->open_sensor&1<<i)
-            return true;
+            return 1;
 
     for (int i = 0; i < NPRESENCE_SENSOR; i++)
         if (data->presence_sensor&1<<i)
-            return true;
+            return 1;
 
-    return false;
+    return 0;
 }
 
 
@@ -36,9 +36,9 @@ void *play_alarm(void *args)
 {
     Data *data = (Data *) args;
 
-    if(alarm_control(data))
+    if(data->alarm && alarm_control(data))
     {
-        data->alarm = !data->alarm;
+        // data->alarm = !data->alarm;
         // if (!fork())
         // {
         //     char *arguments[] = {

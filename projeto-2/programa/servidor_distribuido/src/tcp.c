@@ -2,13 +2,15 @@
 /*                       Header includes                                      */
 
 #include <stdio.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#include <errno.h>
+
+#include "thread.h"
 
 /******************************************************************************/
 /*! @file tcp.c
@@ -62,7 +64,8 @@ void *submit(void *args)
 
     if(connect(client_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
     {
-        printf("Error in connect\n");
+        printf("No connection\n");
+        sig_handler(SIGINT);
     }
 
     Data *data = (Data *) args;

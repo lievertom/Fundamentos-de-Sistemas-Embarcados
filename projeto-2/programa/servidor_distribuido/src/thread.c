@@ -65,7 +65,13 @@ void sig_handler (int signal)
     pthread_join(lamp_thread, NULL);
     pthread_join(sensor_thread, NULL);
     pthread_cancel(receive_thread);
-    close(data.server_socket);    
+    close(data.server_socket);
+    turn_on_off(LAMP_1, OFF);
+    turn_on_off(LAMP_2, OFF);
+    turn_on_off(LAMP_3, OFF);
+    turn_on_off(LAMP_4, OFF); 
+    turn_on_off(AC_2, OFF);
+    turn_on_off(AC_1, OFF);
     bcm2835_close();
     exit(0);
 }
@@ -75,6 +81,9 @@ void sig_handler (int signal)
  */
 void initialize_threads()
 {
+
+    initialize_gpio();
+    initialize_sensor();
     initialize_tcp_server(&data);
 
     pthread_create(&receive_thread, NULL, receive, (void *) &data);
