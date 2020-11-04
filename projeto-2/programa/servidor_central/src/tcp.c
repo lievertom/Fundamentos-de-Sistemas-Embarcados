@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 
 /******************************************************************************/
 /*! @file tcp.c
@@ -58,7 +59,7 @@ void *submit(void *args)
 
     memset(&server_address, 0, sizeof(server_address));
     server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = inet_addr(SERVER_IP);
+    server_address.sin_addr.s_addr = inet_addr(CENTRAL_SERVER_IP);
     server_address.sin_port = htons(DISTRIBUTED_SERVER_PORT);
 
     if(connect(client_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
@@ -100,17 +101,18 @@ void initialize_tcp_server(Data *data)
 
 #ifdef SO_REUSEPORT
     if (setsockopt(data->server_socket, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(enable)) < 0) 
-        perror("setsockopt(SO_REUSEPORT) failed");
+        printf("Error in setsockopt(SO_REUSEPORT)");
 #endif
 
     memset(&server_address, 0, sizeof(server_address));
     server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = htonl(INADDR_ANY);
+    server_address.sin_addr.s_addr = inet_addr(DISTRIBUTED_SERVER_IP);
     server_address.sin_port = htons(CENTRAL_SERVER_PORT);
  
     if(bind(data->server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
     {
         printf("Error in bind\n");
+        printf("Error code: %d\n", errno);
         exit(2);
     }
 
