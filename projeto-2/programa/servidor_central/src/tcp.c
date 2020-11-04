@@ -106,7 +106,7 @@ void initialize_tcp_server(Data *data)
 
     memset(&server_address, 0, sizeof(server_address));
     server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = inet_addr(DISTRIBUTED_SERVER_IP);
+    server_address.sin_addr.s_addr = htonl(INADDR_ANY);
     server_address.sin_port = htons(CENTRAL_SERVER_PORT);
  
     if(bind(data->server_socket, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
