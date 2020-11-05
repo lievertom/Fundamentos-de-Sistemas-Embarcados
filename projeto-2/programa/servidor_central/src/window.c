@@ -402,13 +402,13 @@ void *output_values (void *args)
 
     move(line,BUTTON_SIZE*5);
     if (data->air_reference_temperature > 0.0f)
-        printw("Reference Temperature: %.2f   ", data->air_reference_temperature);
+        printw("Reference Temperature: %.2f oC  ", data->air_reference_temperature);
     else
-        printw("Reference Temperature: desabled   ");
+        printw("Reference Temperature: desabled    ");
     move(++line,BUTTON_SIZE*5);
     printw("Temperature: %.2f oC  ", data->temperature);
     move(++line,BUTTON_SIZE*5);
-    printw("Humidity: %.2f  ", data->humidity);
+    printw("Humidity: %.2f ·/. ", data->humidity);
 
     line += 2;
     
