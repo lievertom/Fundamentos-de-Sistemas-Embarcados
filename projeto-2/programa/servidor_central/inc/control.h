@@ -1,10 +1,25 @@
-#ifndef THREAD_H_
-#define THREAD_H_
+#ifndef CONTROL_H_
+#define CONTROL_H_
 
 /****************************************************************************/
 /*!                         Functions                                       */
 
+/*!
+ *  @brief Function to send message.
+ *
+ *  @return void.
+ *
+ */
+void push();
 
+/*!
+ *  @brief Function to store log.
+ *
+ *  @param[in] message        :  char pointer to the message to be saved in the log
+ * 
+ *  @return void.
+ *
+ */
 void store_data(char *message);
 
 /*!
@@ -28,13 +43,11 @@ void sig_handler(int signal);
 void alarm_handler(int signum);
 
 /*!
- *  @brief Function to init the main thread
+ *  @brief Function to init the prog.
  *
  *  @return void.
  *
  */
-void initialize_threads();
+void initialize_system();
 
-void push();
-
-#endif /* THREAD_H_ */
+#endif /* CONTROL_H_ */

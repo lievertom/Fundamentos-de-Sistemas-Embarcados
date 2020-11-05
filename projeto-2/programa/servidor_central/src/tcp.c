@@ -18,6 +18,9 @@
 /****************************************************************************/
 /*!                         Functions                                       */
 
+/*!
+ * @brief This function receive the message.
+ */
 void *receive(void *args)
 {
     Data *data = (Data *) args;
@@ -47,6 +50,9 @@ void *receive(void *args)
     }    
 }
 
+/*!
+ * @brief This function send the message.
+ */
 void *submit(void *args)
 {
     struct sockaddr_in server_address;

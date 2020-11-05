@@ -4,12 +4,12 @@
 #include <curses.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include "data.h"
 #include "alarm.h"
-#include "thread.h"
+#include "control.h"
 
 /******************************************************************************/
 /*! @file window.c
@@ -47,6 +47,9 @@ const char *message[] =
 /*!                         Functions                                       */
 
 
+/*!
+ * @brief Function used to create the lamps button.
+ */
 void create_button_lamp ()
 {
     for (int i = 0; i < NLAMP; i++)
@@ -62,6 +65,9 @@ void create_button_lamp ()
     }
 }
 
+/*!
+ * @brief Function used to create the AC button.
+ */
 void create_button_air()
 {
     wmove(menu_bar,0,NLAMP*BUTTON_SIZE);
@@ -72,6 +78,9 @@ void create_button_air()
     wattroff(menu_bar,COLOR_PAIR(5));
 } 
 
+/*!
+ * @brief Function used to create the alarm button.
+ */
 void create_button_alarm()
 {
     wmove(menu_bar,0,(NLAMP+1)*BUTTON_SIZE);
@@ -82,6 +91,9 @@ void create_button_alarm()
     wattroff(menu_bar,COLOR_PAIR(3));
 }
 
+/*!
+ * @brief Function used to draw the switch.
+ */
 void switch_draw(bool turn, unsigned char key)
 {
     wmove(menu_bar,FIRST_LINE_MENU,key*BUTTON_SIZE+6);
@@ -99,6 +111,9 @@ void switch_draw(bool turn, unsigned char key)
     }
 }
 
+/*!
+ * @brief Function used to switch the lamps.
+ */ 
 bool switch_button(unsigned char key, Data *data)
 {
     bool auxiliary;
@@ -111,6 +126,9 @@ bool switch_button(unsigned char key, Data *data)
     return auxiliary;
 }
 
+/*!
+ * @brief Function used to switch the alarm.
+  */ 
 void switch_alarm (unsigned char key, Data *data, char *buffer)
 {
     if (!data->alarm && alarm_control(data))
@@ -391,8 +409,6 @@ void *output_values (void *args)
     printw("Temperature: %.2f oC  ", data->temperature);
     move(++line,BUTTON_SIZE*5);
     printw("Humidity: %.2f  ", data->humidity);
-    move(++line,BUTTON_SIZE*5);
-    printw("alarm: %d  ", data->alarm);
 
     line += 2;
     

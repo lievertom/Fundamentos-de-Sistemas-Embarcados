@@ -31,7 +31,9 @@ unsigned char alarm_control(Data *data)
     return 0;
 }
 
-
+/*!
+ * @brief Function to play the alarm.
+ */
 void *play_alarm(void *args)
 {
     Data *data = (Data *) args;

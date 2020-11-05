@@ -8,7 +8,7 @@
 #include <sys/mman.h>
 
 #include "data.h"
-#include "thread.h"
+#include "control.h"
 
 /******************************************************************************/
 /*! @file gpio.c
@@ -20,7 +20,7 @@
 /*!                         Functions                                       */
 
 /*!
- * @brief This function configure gpio ports as an outlet for the fan and resistance.
+ * @brief This function configure the gpio ports.
  */
 void configuration()
 {
@@ -91,6 +91,9 @@ void *ac_control (void *args)
     return NULL;
 }
 
+/*!
+ * @brief Thread function that controls the actuators.
+ */
 void *lamp_control (void *args)
 {
     Data *data = (Data *) args;

@@ -11,7 +11,7 @@
 #include <time.h>
 
 #include "bme280.h"
-#include "thread.h"
+#include "control.h"
 #include "data.h"
 
 /******************************************************************************/
@@ -149,6 +149,9 @@ void initialize_sensor()
     }
 }
 
+/*!
+ * @brief This function update temperature and humidity.
+ */
 void *update_data_sensor(void *args)
 {
     Data *data = (Data *) args;

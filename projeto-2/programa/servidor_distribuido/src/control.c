@@ -11,10 +11,10 @@
 #include "tcp.h"
 
 /******************************************************************************/
-/*! @file thread.c
- * @brief Interface for threads
+/*! @file control.c
+ * @brief Interface for threads control
  */
-#include "thread.h"
+#include "control.h"
 
 /****************************************************************************/
 /*!                        Global Statements                                */
@@ -77,9 +77,9 @@ void sig_handler (int signal)
 }
 
 /*!
- * @brief Function to init the main thread.
+ * @brief Function to init the prog.
  */
-void initialize_threads()
+void initialize_system()
 {
 
     initialize_gpio();
@@ -93,6 +93,9 @@ void initialize_threads()
     pthread_join(receive_thread, NULL);
 }
 
+/*!
+ * @brief Function used to send message.
+ */
 void push()
 {
     pthread_join(send_thread, NULL);

@@ -5,16 +5,16 @@
 #include <stdlib.h>
 #include <pthread.h>
 
+#include "tcp.h"
 #include "data.h"
 #include "alarm.h"
 #include "window.h"
-#include "tcp.h"
 
 /******************************************************************************/
-/*! @file thread.c
- * @brief Interface for threads
+/*! @file control.c
+ * @brief Interface for threads control
  */
-#include "thread.h"
+#include "control.h"
 
 /****************************************************************************/
 /*!                        Global Statements                                */
@@ -38,6 +38,15 @@ void store_data (char *message)
 {
     pthread_join(log_thread, NULL);
     pthread_create(&log_thread, NULL, save_data, (void *) message);
+}
+
+/*!
+ * @brief Function used to send message.
+ */
+void push()
+{
+    pthread_join(send_thread, NULL);
+    pthread_create(&send_thread, NULL, submit, (void *) &data);
 }
 
 /*!
@@ -68,9 +77,9 @@ void sig_handler (int signal)
 }
 
 /*!
- * @brief Function to init the main thread.
+ * @brief Function to init the prog.
  */
-void initialize_threads()
+void initialize_system()
 {
     data.lamp = 0;
     data.alarm = 0;
@@ -96,10 +105,4 @@ void initialize_threads()
     alarm(1);
 
     pthread_join(input_thread, NULL);
-}
-
-void push()
-{
-    pthread_join(send_thread, NULL);
-    pthread_create(&send_thread, NULL, submit, (void *) &data);
 }

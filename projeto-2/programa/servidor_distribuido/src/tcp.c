@@ -10,7 +10,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
-#include "thread.h"
+#include "control.h"
 
 /******************************************************************************/
 /*! @file tcp.c
@@ -21,6 +21,9 @@
 /****************************************************************************/
 /*!                         Functions                                       */
 
+/*!
+ * @brief Function to receive the message.
+ */
 void *receive(void *args)
 {
     Data *data = (Data *) args;
@@ -47,6 +50,9 @@ void *receive(void *args)
     }    
 }
 
+/*!
+ * @brief Function to send the message.
+ */
 void *submit(void *args)
 {
     struct sockaddr_in server_address;

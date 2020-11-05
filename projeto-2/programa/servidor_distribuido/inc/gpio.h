@@ -51,7 +51,7 @@ void initialize_gpio();
 void turn_on_off(int device, int turn);
 
 /*!
- *  @brief Thread function that controls the actuators
+ *  @brief Thread function that control the presence and open sensor 
  *
  * @param[in] args       : Pointer to access the data structure
  *
@@ -61,7 +61,7 @@ void turn_on_off(int device, int turn);
 void *sensor_control (void *args);
 
 /*!
- *  @brief Thread function that controls the actuators
+ *  @brief Thread function that control the lamps
  *
  * @param[in] args       : Pointer to access the data structure
  *
@@ -72,7 +72,7 @@ void *lamp_control (void *args);
 
 
 /*!
- *  @brief Thread function that controls the actuators
+ *  @brief Thread function that controls the AC
  *
  * @param[in] args       : Pointer to access the data structure
  *

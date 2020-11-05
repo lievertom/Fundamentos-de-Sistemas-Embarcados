@@ -5,7 +5,7 @@
 #include <signal.h>
 #include <stdio.h>
 
-#include "thread.h"
+#include "control.h"
 
 /****************************************************************************/
 /*                            Main                                          */
@@ -21,5 +21,5 @@ int main(int argc, char* argv[])
     signal(SIGSTOP, sig_handler);
     signal(SIGINT, sig_handler);
     
-    initialize_threads();
+    initialize_system();
 }

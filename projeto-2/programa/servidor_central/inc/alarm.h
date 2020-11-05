@@ -2,31 +2,32 @@
 #define ALARM_H_
 
 /****************************************************************************/
-/*                       Header includes                                    */
-
-
-/****************************************************************************/
 /*!                              Macros                                     */
 
 #define COMMAND     "omxplayer"
 #define PATH_AUDIO  "ast/example.mp3"
 
 /****************************************************************************/
-/*!                            Structs                                      */
-
-/****************************************************************************/
 /*!                         Functions                                       */
 
 /*!
- *  @brief Thread function that control the alarm
+ *  @brief function that control the alarm
  *
- * @param[in] args       : Pointer to access the data structure
+ * @param[in] data       : Pointer to access the data structure
  *
  *  @return void
  *
  */
 unsigned char alarm_control(Data *data);
 
+/*!
+ *  @brief Thread function that play the alarm.
+ *
+ * @param[in] args       : Pointer to access the data structure
+ *
+ *  @return void
+ *
+ */
 void *play_alarm(void *args);
 
 
