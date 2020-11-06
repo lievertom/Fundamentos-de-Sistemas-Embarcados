@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
 #include <pthread.h>
 
 #include "data.h"
@@ -137,6 +138,11 @@ void switch_alarm (unsigned char key, Data *data, char *buffer)
     }
     else
     {
+        if (data->alarm_pid)
+        {
+            kill(data->alarm_pid, SIGKILL);
+            data->alarm_pid = 0;
+        }
         data->alarm = !(data->alarm);
 
         switch_draw(data->alarm, key);

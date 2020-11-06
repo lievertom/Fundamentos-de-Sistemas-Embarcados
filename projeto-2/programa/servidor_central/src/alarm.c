@@ -38,25 +38,24 @@ void *play_alarm(void *args)
 {
     Data *data = (Data *) args;
 
-    if(data->alarm && alarm_control(data))
+    if(data->alarm && alarm_control(data) && !data->alarm_pid)
     {
-        // data->alarm = 0;
-        // pid = fork();
-        // if (!pid)
-        // {
-        //     char *arguments[] = {
-        //         COMMAND,
-        //         PATH_AUDIO,
-        //         NULL
-        //     };
+        data->alarm_pid = fork();
+        if (!data->alarm_pid)
+        {
+            char *arguments[] = {
+                COMMAND,
+                PATH_AUDIO,
+                NULL
+            };
 
-        //     execvp(COMMAND, arguments);
-        // }
-        // else
-        // {
-        //     sleep(3);
-        //     kill(pid, SIGKILL);
-        // }
+            alarm(0);
+
+            while (1)
+            {
+                execvp(COMMAND, arguments);
+            }
+        }
     }
 
     return NULL;

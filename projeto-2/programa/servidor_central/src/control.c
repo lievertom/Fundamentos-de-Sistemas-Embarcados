@@ -3,6 +3,7 @@
 
 #include <unistd.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <pthread.h>
 
 #include "tcp.h"
@@ -70,6 +71,8 @@ void sig_handler (int signal)
     alarm(0);
     pthread_cancel(receive_thread);
     pthread_join(output_thread, NULL);
+    if (data.alarm_pid)
+        kill(data.alarm_pid, SIGKILL);
     end_window();
     close(data.server_socket);
     printf("exit, log saved to dat/data.csv\n");
@@ -84,6 +87,7 @@ void initialize_system()
     data.lamp = 0;
     data.alarm = 0;
     data.air_turn = 0;
+    data.alarm_pid = 0;
     data.open_sensor = 0;
     data.presence_sensor = 0;
 
