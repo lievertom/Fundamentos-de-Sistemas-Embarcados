@@ -53,7 +53,11 @@ void *play_alarm(void *args)
 
             while (1)
             {
-                execvp(COMMAND, arguments);
+                pid_t child = fork();
+                if (!child)
+                    execvp(COMMAND, arguments);
+                else
+                    wait(child);                
             }
         }
     }
