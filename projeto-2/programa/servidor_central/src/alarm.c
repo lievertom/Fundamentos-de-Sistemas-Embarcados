@@ -40,8 +40,9 @@ void *play_alarm(void *args)
 
     if(data->alarm && alarm_control(data))
     {
-        // data->alarm = !data->alarm;
-        // if (!fork())
+        // data->alarm = 0;
+        // pid = fork();
+        // if (!pid)
         // {
         //     char *arguments[] = {
         //         COMMAND,
@@ -50,6 +51,11 @@ void *play_alarm(void *args)
         //     };
 
         //     execvp(COMMAND, arguments);
+        // }
+        // else
+        // {
+        //     sleep(3);
+        //     kill(pid, SIGKILL);
         // }
     }
 
