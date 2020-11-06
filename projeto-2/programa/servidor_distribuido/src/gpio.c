@@ -74,19 +74,38 @@ void turn_on_off(int device, int turn)
 void *ac_control (void *args)
 {
     Data *data = (Data *) args;
-    if (data->air_reference_temperature > 0.0f && data->air_reference_temperature <= data->temperature)
+
+    if (data->air_reference_temperature > 0.0f &&
+        data->air_reference_temperature+HYSTERERIS/2 <= data->temperature)
     {
-        turn_on_off(AC_1, ON);
-        turn_on_off(AC_2, ON);
-        for(int i = 0; i < NAC; i++)
-            data->air_turn |= 1<<i;
+        data->air_turn |= 1<<8;
     }
     else
     {
-        turn_on_off(AC_1, OFF);
-        turn_on_off(AC_2, OFF);
-        for(int i = 0; i < NAC; i++)
-            data->air_turn &= 0<<i;
+        data->air_turn &= 0<<8;
+    }
+
+    if (data->air_reference_temperature > 0.0f && 
+        data->air_reference_temperature-HYSTERERIS/2 <= data->temperature &&
+        data->air_turn ^ 1<<8)
+    {
+        if (data->air_turn ^ 1<<0)
+        {
+            turn_on_off(AC_1, ON);
+            turn_on_off(AC_2, ON);
+            for(int i = 0; i < NAC; i++)
+                data->air_turn |= 1<<i;
+        }
+    }
+    else
+    {
+        if (data->air_turn & 1<<0)
+        {
+            turn_on_off(AC_1, OFF);
+            turn_on_off(AC_2, OFF);
+            for(int i = 0; i < NAC; i++)
+                data->air_turn &= 0<<i;
+        }
     }
     return NULL;
 }
