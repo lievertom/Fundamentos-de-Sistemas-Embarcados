@@ -76,17 +76,18 @@ void *ac_control (void *args)
     Data *data = (Data *) args;
 
     if (data->air_reference_temperature > 0.0f &&
-        data->air_reference_temperature+HYSTERERIS/2 <= data->temperature)
-    {
-        data->air_turn |= 1<<8;
-    }
-    else
+        data->air_reference_temperature+HYSTERERIS/2 < data->temperature)
     {
         data->air_turn &= 0<<8;
     }
+    else if (data->air_reference_temperature > 0.0f &&
+        data->air_reference_temperature-HYSTERERIS/2 >= data->temperature)
+    {
+        data->air_turn |= 1<<8;
+    }
 
     if (data->air_reference_temperature > 0.0f && 
-        data->air_reference_temperature-HYSTERERIS/2 <= data->temperature &&
+        data->air_reference_temperature-HYSTERERIS/2 < data->temperature &&
         data->air_turn ^ 1<<8)
     {
         if (data->air_turn ^ 1<<0)
