@@ -57,10 +57,13 @@ void alarm_handler(int signum)
 {   
     alarm(1);
     pthread_join(output_thread, NULL);
-    if (!data.alarm)
-        pthread_create(&alarm_thread, NULL, play_alarm, (void *) &data);        
+    pthread_create(&output_thread, NULL, output_values, (void *) &data);
 
-    pthread_create(&output_thread, NULL, output_values, (void *) &data);        
+    if (data.alarm)
+    {
+        pthread_join(alarm_thread, NULL);
+        pthread_create(&alarm_thread, NULL, play_alarm, (void *) &data);        
+    }
 }
 
 /*!
@@ -69,12 +72,13 @@ void alarm_handler(int signum)
 void sig_handler (int signal)
 {
     alarm(0);
-    pthread_cancel(receive_thread);
-    pthread_join(output_thread, NULL);
-    if (data.alarm_pid)
+    if(data.alarm_pid)
         kill(data.alarm_pid, SIGKILL);
-    end_window();
+    pthread_cancel(receive_thread);
     close(data.server_socket);
+    pthread_join(output_thread, NULL);
+    end_window();
+    system("fuser -k 10027/tcp");
     printf("exit, log saved to dat/data.csv\n");
     exit(0);
 }
@@ -87,7 +91,6 @@ void initialize_system()
     data.lamp = 0;
     data.alarm = 0;
     data.air_turn = 0;
-    data.alarm_pid = 0;
     data.open_sensor = 0;
     data.presence_sensor = 0;
 

@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 #include "data.h"
 
@@ -38,27 +39,15 @@ void *play_alarm(void *args)
 {
     Data *data = (Data *) args;
 
-    if(data->alarm && alarm_control(data) && !data->alarm_pid)
+    if (!data->alarm_pid && alarm_control(data))
     {
+        alarm(0);
         data->alarm_pid = fork();
-        if (!data->alarm_pid)
+        
+        if(!data->alarm_pid)
         {
-            char *arguments[] = {
-                COMMAND,
-                PATH_AUDIO,
-                NULL
-            };
-
-            alarm(0);
-
-            while (1)
-            {
-                pid_t child = fork();
-                if (!child)
-                    execvp(COMMAND, arguments);
-                else
-                    wait(child);                
-            }
+            while(1)
+                system ("omxplayer ast/example.mp3 > /dev/null 2>&1");
         }
     }
 
